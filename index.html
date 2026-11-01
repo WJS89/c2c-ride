@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>C2C on the BikeErg</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E9EEEC; --card:#F7F9F8; --ink:#1E2A2F; --muted:#5B6A70; --line:#C9D3D0;
+  --heather:#6E4673; --moss:#4D6A38; --sea:#2A6787; --fell:#9DAEA8; --done:#4D6A38; --amber:#8A6A3A; --water:#D3E2E8;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#141B1E; --card:#1C2529; --ink:#E4ECE9; --muted:#97A7AC; --line:#2E3B40;
+    --heather:#B58CBB; --moss:#8DB46E; --sea:#6FAFD0; --fell:#5A6E74; --done:#8DB46E; --amber:#C9A266; --water:#1A2C35;
+    color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 Barlow,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 48px}
+h1{font:700 clamp(2rem,8vw,3rem)/1 "Barlow Condensed","Arial Narrow",sans-serif;margin:4px 0 2px}
+h2{font:700 1.35rem "Barlow Condensed","Arial Narrow",sans-serif;margin:20px 0 6px}
+.sub{color:var(--muted);margin:0 0 12px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:6px}
+.mapbox{height:260px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+#ovMap{height:210px}
+.leaflet-container{font-family:Barlow,sans-serif;background:var(--water)}
+.conn{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--fell)}
+.dot.on{background:var(--moss)}
+.pmvals{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto}
+.pmvals div{text-align:right}
+.pmvals b{display:block;font:700 1.4rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
+.pmvals span{font-size:.75rem;color:var(--muted)}
+.live{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:14px;margin:10px 0;transition:box-shadow .2s}
+.live.flash{box-shadow:0 0 0 4px var(--heather)}
+.damp{width:96px;height:96px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+.damp b{font:700 3.4rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
+.damp span{font-size:.75rem;opacity:.9}
+.tw{font:700 2rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
+.tw small{font:500 1rem Barlow,sans-serif;color:var(--muted)}
+.terr{font-weight:600}
+.nextc{color:var(--muted);font-size:.92rem}
+.bar{grid-column:1/-1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--moss);width:0}
+.readout{grid-column:1/-1;display:flex;justify-content:space-between;font:600 1.15rem "Barlow Condensed","Arial Narrow",sans-serif}
+.controls,.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.row label{font-weight:600}
+button{font:600 1rem Barlow,sans-serif;padding:10px 16px;border-radius:4px;border:1px solid var(--moss);background:var(--moss);color:var(--card);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+input[type=number]{width:86px;font:600 1rem Barlow,sans-serif;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink)}
+.hint{color:var(--muted);font-size:.85rem;margin:4px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.grid button{padding:8px 0;background:var(--card);color:var(--ink);border:1px solid var(--line);font:700 1.2rem "Barlow Condensed","Arial Narrow",sans-serif}
+.grid button.climb{border-bottom:4px solid var(--heather)}
+.grid button.isdone{background:var(--done);color:var(--card);border-color:var(--done)}
+.grid button.sel{outline:3px solid var(--sea);outline-offset:1px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.95rem}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:500;font-size:.85rem}
+td.t{white-space:normal}
+tr.cur td{background:var(--water)}
+.d{display:inline-block;min-width:1.8rem;text-align:center;font-weight:700;border-radius:3px;padding:1px 4px;color:#fff}
+.w-up{color:var(--heather);font-weight:600}.w-dn{color:var(--sea);font-weight:600}
+.stats{display:flex;gap:22px;flex-wrap:wrap;margin:6px 2px}
+.stat b{display:block;font:700 1.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
+.stat span{color:var(--muted);font-size:.85rem}
+#elev{display:block;width:100%;height:auto;margin-top:6px}
+#debug{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--muted);white-space:pre-wrap;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.live{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Whitehaven to Tynemouth</h1>
+  <p class="sub" id="secTitle"></p>
+
+  <div class="panel conn">
+    <span class="dot" id="dot"></span>
+    <button id="connect">Connect PM5</button>
+    <span id="connMsg" class="hint">Not connected – using estimated distance</span>
+    <div class="pmvals">
+      <div><b id="pmW">–</b><span>watts</span></div>
+      <div><b id="pmR">–</b><span>rpm</span></div>
+      <div><b id="pmD">–</b><span>drag factor</span></div>
+    </div>
+  </div>
+
+  <div class="panel live" id="live" aria-live="polite">
+    <div class="damp" id="damp"><span>Damper</span><b id="dVal">4</b></div>
+    <div>
+      <div class="tw"><span id="wVal">130 W</span> <small>target</small></div>
+      <div class="terr" id="tVal"></div>
+      <div class="nextc" id="nVal"></div>
+    </div>
+    <div class="bar"><i id="barI"></i></div>
+    <div class="readout"><span id="clock">0:00</span><span id="dist">0.0 / 0 km</span></div>
+  </div>
+
+  <h2 id="secMapH">This section</h2>
+  <div class="mapbox" id="secMap"></div>
+
+  <h2>Whole route</h2>
+  <div class="mapbox" id="ovMap"></div>
+  <svg id="elev" viewBox="0 0 1000 120" role="img" aria-label="Route elevation profile"></svg>
+
+  <div class="controls">
+    <button id="go">Start</button>
+    <button class="ghost" id="zero">Zero distance here</button>
+    <button class="ghost" id="test">Test alarm</button>
+  </div>
+  <p class="hint" id="modeHint"></p>
+
+  <div class="row" id="syncRow">
+    <label for="sync">PM5 distance</label>
+    <input id="sync" type="number" step="0.1" min="0" inputmode="decimal" placeholder="km">
+    <button class="ghost" id="syncBtn">Sync</button>
+  </div>
+
+  <div class="row">
+    <label for="baseW">Base watts</label>
+    <input id="baseW" type="number" min="60" max="300" step="5" value="130" inputmode="numeric">
+  </div>
+
+  <h2>Sections</h2>
+  <div class="stats">
+    <div class="stat"><b id="kmDone">0</b><span>of 222 km ridden</span></div>
+    <div class="stat"><b id="secDone">0</b><span>of 13 sections</span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <h2 id="planH">Plan</h2>
+  <div class="scroll"><table><thead><tr><th>Switch at</th><th>Terrain</th><th>Damper</th><th>Target</th></tr></thead><tbody id="plan"></tbody></table></div>
+
+  <h2>Route file</h2>
+  <p class="hint" id="gpxMsg"></p>
+  <div class="row">
+    <input type="file" id="gpxFile" accept=".gpx,application/gpx+xml">
+    <button class="ghost" id="gpxClear">Use built-in route</button>
+  </div>
+
+  <div class="controls">
+    <button class="ghost" id="markBtn">Mark section done</button>
+    <button class="ghost" id="reset">Reset all progress</button>
+    <button class="ghost" id="dbgBtn">Show PM5 data</button>
+  </div>
+  <div id="debug" hidden></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ---------------- Route plan ----------------
+const SECTIONS = [
+ {from:"Whitehaven",to:"Rowrah",a:0,b:14,blocks:[[3,-10,"Harbour warm-up"],[3,0,"Railway path"],[4,0,"Railway path"],[4,5,"Gentle drag"],[4,5,"Gentle drag"],[3,0,"Cleator Moor"],[4,5,"Rise towards Rowrah"],[3,0,"Into Rowrah"]]},
+ {from:"Rowrah",to:"Lorton",a:14,b:32,blocks:[[4,0,"Lanes past Lamplugh"],[5,10,"Rolling"],[6,15,"Climb above Loweswater"],[5,10,"Over the top"],[3,-10,"Descent to Loweswater"],[4,0,"Lakeside"],[5,5,"Rolling"],[4,0,"Into Lorton"]]},
+ {from:"Lorton",to:"Keswick",a:32,b:50,climb:true,blocks:[[4,0,"Lorton valley"],[7,20,"Whinlatter begins"],[8,30,"Steep ramps"],[9,35,"Push to the top"],[7,20,"Forest summit"],[2,-30,"Descent to Braithwaite"],[3,-10,"Valley floor"],[4,0,"Into Keswick"]]},
+ {from:"Keswick",to:"Mungrisdale",a:50,b:68,blocks:[[3,-5,"Railway path"],[3,0,"Railway path"],[4,5,"Threlkeld"],[5,10,"Climb beside the A66"],[6,15,"Climb"],[5,10,"Easing"],[4,0,"Open fell road"],[4,0,"Into Mungrisdale"]]},
+ {from:"Mungrisdale",to:"Penrith",a:68,b:88,blocks:[[4,0,"Fell-foot lanes"],[5,10,"Rolling"],[4,0,"Rolling"],[5,10,"Rise to Greystoke"],[3,-10,"Descent"],[4,0,"Farmland"],[4,0,"Farmland"],[3,-5,"Into Penrith"]]},
+ {from:"Penrith",to:"Renwick",a:88,b:105,blocks:[[3,0,"Out of town"],[4,0,"Eden valley"],[4,5,"Eden valley"],[3,0,"Langwathby"],[4,5,"Little Salkeld"],[5,10,"Rising lanes"],[6,15,"Pennine foothills"],[5,10,"Into Renwick"]]},
+ {from:"Renwick",to:"Garrigill",a:105,b:122,climb:true,blocks:[[4,-10,"Rolling, foot of climb"],[7,20,"Climb begins"],[9,35,"Steepest ramps"],[8,25,"Grind to Hartside"],[2,-30,"Descent"],[3,-15,"Valley run-out"],[6,10,"Short climb"],[4,0,"Easy into Garrigill"]]},
+ {from:"Garrigill",to:"Allenheads",a:122,b:138,climb:true,blocks:[[6,15,"Climb out of Garrigill"],[8,30,"Steep to Nenthead"],[5,5,"Nenthead"],[8,30,"Climb over the tops"],[9,35,"Highest road"],[7,20,"Moorland"],[3,-15,"Descent"],[3,-10,"Into Allenheads"]]},
+ {from:"Allenheads",to:"Parkhead Station",a:138,b:155,climb:true,blocks:[[8,30,"Climb to Black Hill"],[9,40,"Summit, 609 m"],[2,-30,"Plunge to Rookhope"],[3,-10,"Rookhope"],[8,30,"Rookhope climb"],[9,35,"Steepest stretch"],[7,20,"Moor top"],[5,5,"Parkhead Station"]]},
+ {from:"Parkhead Station",to:"Consett",a:155,b:175,blocks:[[4,0,"Waskerley Way"],[3,-5,"Gentle descent"],[3,-5,"Gentle descent"],[3,-10,"Gentle descent"],[4,0,"Moorland path"],[3,-5,"Easing down"],[2,-10,"Descent to Consett"],[3,0,"Consett"]]},
+ {from:"Consett",to:"Swalwell",a:175,b:194,blocks:[[3,-5,"Derwent Walk"],[2,-10,"Descending path"],[3,-5,"Railway path"],[3,0,"Viaducts"],[2,-10,"Rowlands Gill"],[3,-5,"Railway path"],[3,0,"Derwent country park"],[3,0,"Swalwell"]]},
+ {from:"Swalwell",to:"Wallsend",a:194,b:210,blocks:[[3,0,"Tyne bank"],[4,5,"Short rises"],[3,0,"Into Newcastle"],[3,0,"Quayside"],[4,5,"Climb off the quay"],[3,0,"East Newcastle"],[4,0,"Riverside"],[3,0,"Wallsend"]]},
+ {from:"Wallsend",to:"Tynemouth",a:210,b:222,blocks:[[3,0,"Riverside path"],[3,0,"North Shields"],[4,5,"Rise to the Fish Quay"],[3,0,"Fish Quay"],[4,5,"Up to the priory"],[3,0,"Tynemouth"],[3,-5,"Sea front"],[2,-10,"Warm-down at the finish"]]}
+];
+// Built-in route: rough waypoints [planKm, lat, lon]. A GPX file replaces these with the real line.
+const WP=[[0,54.549,-3.587],[8,54.521,-3.515],[14,54.567,-3.444],[19,54.583,-3.380],[27,54.588,-3.335],[32,54.625,-3.315],[38,54.609,-3.228],[44,54.602,-3.193],[50,54.601,-3.135],[57,54.620,-3.054],[68,54.656,-2.982],[78,54.667,-2.865],[88,54.664,-2.752],[96,54.693,-2.664],[105,54.738,-2.638],[112,54.762,-2.555],[122,54.767,-2.411],[128,54.787,-2.340],[138,54.805,-2.218],[143,54.797,-2.160],[148,54.776,-2.098],[155,54.783,-2.030],[165,54.812,-1.937],[175,54.853,-1.832],[185,54.920,-1.744],[194,54.956,-1.690],[202,54.968,-1.605],[210,54.990,-1.533],[218,55.009,-1.449],[222,55.018,-1.420]];
+const PROFILE=[[0,5],[14,150],[25,120],[32,100],[38,318],[44,80],[50,80],[57,180],[68,240],[78,230],[88,150],[96,130],[105,200],[112,580],[118,400],[122,340],[128,450],[132,560],[138,400],[143,609],[148,330],[152,500],[155,450],[175,250],[185,60],[194,10],[210,20],[222,10]];
+
+// BikeErg: watts ≈ 0.35 × speed³ (m/s), used only for estimated mode
+const speedFor=w=>Math.cbrt(Math.max(w,20)/0.35);
+
+// ---------------- State ----------------
+const KEY="c2c-bikeerg-v1", GKEY="c2c-bikeerg-gpx";
+let state={base:130,done:{},sel:1,run:{n:1,dist:0,elapsed:0}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object"){state.base=s.base||130;state.done=s.done||{};state.sel=s.sel||1;state.run=s.run||{n:state.sel,dist:0,elapsed:0};}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+let route=WP.map(w=>[w[1],w[2],w[0]]); let usingGpx=false;
+try{const g=JSON.parse(localStorage.getItem(GKEY)||"null");if(Array.isArray(g)&&g.length>10){route=g;usingGpx=true;}}catch(e){}
+
+const $=id=>document.getElementById(id);
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const colour=d=>d>=8?"var(--heather)":d>=6?"var(--amber)":d<=2?"var(--sea)":"var(--moss)";
+const fmt=s=>{s=Math.max(0,Math.round(s));const m=Math.floor(s/60),r=s%60;return m+":"+String(r).padStart(2,"0");};
+const sec=()=>SECTIONS[state.sel-1];
+const lenM=()=>(sec().b-sec().a)*1000;
+
+// ---------------- Route geometry ----------------
+function posAt(k){for(let i=1;i<route.length;i++){const[la1,lo1,k1]=route[i-1],[la2,lo2,k2]=route[i];if(k<=k2){const t=k2===k1?0:(k-k1)/(k2-k1);return[la1+(la2-la1)*t,lo1+(lo2-lo1)*t];}}const l=route[route.length-1];return[l[0],l[1]];}
+function slice(a,b){return[posAt(a),...route.filter(p=>p[2]>a&&p[2]<b).map(p=>[p[0],p[1]]),posAt(b)];}
+function hav(a,b){const R=6371,r=Math.PI/180,dLa=(b[0]-a[0])*r,dLo=(b[1]-a[1])*r;const h=Math.sin(dLa/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+
+// ---------------- Maps ----------------
+let ovMap=null,secMap=null,L_=window.L;
+let ov={},sm={};
+function tiles(){return L_.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"&copy; OpenStreetMap contributors"});}
+function initMaps(){
+  if(!L_){$("secMap").textContent="Map couldn’t load – check your connection.";$("ovMap").textContent="";return;}
+  ovMap=L_.map("ovMap",{zoomControl:false,scrollWheelZoom:false});tiles().addTo(ovMap);
+  secMap=L_.map("secMap",{zoomControl:true,scrollWheelZoom:false});tiles().addTo(secMap);
+  drawMaps(true);
+}
+function drawMaps(refit){
+  if(!ovMap)return;
+  const fell=css("--fell")||"#9DAEA8",done=css("--done")||"#4D6A38",heather=css("--heather")||"#6E4673",sea=css("--sea")||"#2A6787";
+  [ov,sm].forEach(g=>{(g.layers||[]).forEach(l=>l.remove());g.layers=[];});
+  const full=route.map(p=>[p[0],p[1]]), s=sec();
+  // overview
+  ov.layers.push(L_.polyline(full,{color:fell,weight:4}).addTo(ovMap));
+  SECTIONS.forEach((q,i)=>{if(state.done[i+1])ov.layers.push(L_.polyline(slice(q.a,q.b),{color:done,weight:5}).addTo(ovMap));});
+  ov.layers.push(L_.polyline(slice(s.a,s.b),{color:heather,weight:6}).addTo(ovMap));
+  ov.me=L_.circleMarker(posAt(s.a),{radius:6,color:"#fff",weight:2,fillColor:sea,fillOpacity:1}).addTo(ovMap);ov.layers.push(ov.me);
+  // section
+  sm.layers.push(L_.polyline(full,{color:fell,weight:3,opacity:.7}).addTo(secMap));
+  const segLine=L_.polyline(slice(s.a,s.b),{color:heather,weight:6}).addTo(secMap);sm.layers.push(segLine);
+  // block switch points
+  for(let j=1;j<8;j++){const k=s.a+j*(s.b-s.a)/8;sm.layers.push(L_.circleMarker(posAt(k),{radius:4,color:heather,weight:2,fillColor:"#fff",fillOpacity:1}).bindTooltip("Damper "+s.blocks[j][0]).addTo(secMap));}
+  sm.layers.push(L_.circleMarker(posAt(s.a),{radius:6,color:heather,fillColor:heather,fillOpacity:1}).bindTooltip(s.from).addTo(secMap));
+  sm.layers.push(L_.circleMarker(posAt(s.b),{radius:6,color:done,fillColor:done,fillOpacity:1}).bindTooltip(s.to).addTo(secMap));
+  sm.me=L_.circleMarker(posAt(s.a),{radius:9,color:"#fff",weight:3,fillColor:sea,fillOpacity:1}).addTo(secMap);sm.layers.push(sm.me);
+  if(refit){ovMap.fitBounds(L_.polyline(full).getBounds(),{padding:[12,12]});secMap.fitBounds(segLine.getBounds(),{padding:[24,24]});}
+}
+function moveMarkers(k){const p=posAt(k);if(ov.me)ov.me.setLatLng(p);if(sm.me)sm.me.setLatLng(p);}
+
+// ---------------- Elevation strip ----------------
+const ex=k=>10+k/222*980, ey=m=>110-(m/650)*95;
+function elev(k){for(let i=1;i<PROFILE.length;i++){const[a,ea]=PROFILE[i-1],[b,eb]=PROFILE[i];if(k<=b)return ea+(eb-ea)*(k-a)/(b-a);}return 10;}
+function elArea(a,b){const p=[[a,elev(a)],...PROFILE.filter(q=>q[0]>a&&q[0]<b),[b,elev(b)]];return "M"+ex(a)+",110 "+p.map(q=>"L"+ex(q[0]).toFixed(1)+","+ey(q[1]).toFixed(1)).join(" ")+" L"+ex(b)+",110 Z";}
+function drawElev(){const s=sec();let h=`<path d="${elArea(0,222)}" fill="var(--fell)"/>`;
+  SECTIONS.forEach((q,i)=>{if(state.done[i+1])h+=`<path d="${elArea(q.a,q.b)}" fill="var(--done)"/>`;});
+  h+=`<rect x="${ex(s.a)}" y="5" width="${ex(s.b)-ex(s.a)}" height="105" fill="var(--heather)" opacity="0.18"/>`;
+  [["Whinlatter",38],["Hartside",112],["Black Hill",143]].forEach(([n,k])=>h+=`<text x="${ex(k)}" y="${ey(elev(k))-5}" text-anchor="middle" font-family="Barlow,sans-serif" font-size="13" fill="var(--ink)">${n}</text>`);
+  h+=`<line id="elLine" x1="0" x2="0" y1="5" y2="110" stroke="var(--ink)" stroke-width="2"/>`;
+  $("elev").innerHTML=h;}
+
+// ---------------- Plan & grid ----------------
+function drawPlan(){
+  const s=sec(),len=s.b-s.a;
+  $("secTitle").textContent=`Section ${state.sel}: ${s.from} → ${s.to}, ${len} km`;
+  $("secMapH").textContent=`This section: ${s.from} → ${s.to}`;
+  $("planH").textContent=`Section ${state.sel} plan`;
+  $("plan").innerHTML=s.blocks.map((bl,j)=>{const[d,off,t]=bl,w=state.base+off;
+    return `<tr data-j="${j}"><td>${(j*len/8).toFixed(1)} km</td><td class="t">${t}</td><td><span class="d" style="background:${colour(d)}">${d}</span></td><td class="${off>0?"w-up":off<0?"w-dn":""}">${w} W</td></tr>`;}).join("");
+  $("grid").innerHTML=SECTIONS.map((q,i)=>`<button class="${q.climb?"climb ":""}${state.done[i+1]?"isdone ":""}${state.sel===i+1?"sel":""}" data-n="${i+1}" aria-label="Section ${i+1}, ${q.from} to ${q.to}${state.done[i+1]?", done":""}">${i+1}</button>`).join("");
+  const dn=Object.keys(state.done).map(Number);
+  $("secDone").textContent=dn.length;
+  $("kmDone").textContent=dn.reduce((t,n)=>t+SECTIONS[n-1].b-SECTIONS[n-1].a,0);
+  $("markBtn").textContent=state.done[state.sel]?`Mark section ${state.sel} not done`:`Mark section ${state.sel} done`;
+  $("gpxMsg").textContent=usingGpx?"Using your GPX route line.":"Using a rough built-in line. Load the C2C GPX (Whitehaven to Tynemouth) for the real route on the map.";
+  drawElev();
+}
+
+// ---------------- Live panel ----------------
+function blockIdx(dist){return Math.min(7,Math.floor(dist/(lenM()/8)));}
+function curSpeed(w){return (pm.connected&&pm.speed>0.5)?pm.speed:speedFor(w);}
+function drawLive(){
+  const s=sec(),L=lenM(),dist=state.run.dist,j=blockIdx(dist),[d,off,t]=s.blocks[j],w=state.base+off,v=curSpeed(w);
+  $("dVal").textContent=d;$("damp").style.background=colour(d);
+  $("wVal").textContent=w+" W";$("tVal").textContent=t;
+  if(dist>=L)$("nVal").textContent="Section complete";
+  else if(j<7){const nb=s.blocks[j+1],sw=(j+1)*L/8;$("nVal").textContent=`Next: damper ${nb[0]}, ${state.base+nb[1]} W at ${(sw/1000).toFixed(1)} km, in ${fmt((sw-dist)/v)}`;}
+  else $("nVal").textContent=`Finish in ${fmt((L-dist)/v)}`;
+  $("barI").style.width=(dist/L*100)+"%";
+  $("clock").textContent=fmt(state.run.elapsed);
+  $("dist").textContent=`${(dist/1000).toFixed(2)} / ${L/1000} km`;
+  const k=s.a+dist/1000;moveMarkers(k);
+  const el=$("elLine");if(el){el.setAttribute("x1",ex(k));el.setAttribute("x2",ex(k));}
+  document.querySelectorAll("#plan tr").forEach(r=>r.classList.toggle("cur",+r.dataset.j===j));
+}
+function drawMode(){
+  $("go").hidden=pm.connected;$("syncRow").hidden=pm.connected;
+  $("modeHint").textContent=pm.connected
+    ?"Live from the PM5. Start a new piece on the monitor at the start of the section, or tap Zero distance here."
+    :"Estimated mode: distance is worked out from the target watts. Tap Start when you start pedalling.";
+}
+
+// ---------------- Sound ----------------
+let ac=null;
+function audio(){try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();}catch(e){}return ac;}
+function tone(f,st,dur,vol=0.25){const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.value=f;const t0=a.currentTime+st;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+0.02);g.gain.exponentialRampToValueAtTime(0.001,t0+dur);o.connect(g).connect(a.destination);o.start(t0);o.stop(t0+dur+0.05);}
+const warnSound=()=>{tone(880,0,0.15);tone(880,0.3,0.15);};
+const changeSound=()=>{tone(660,0,0.25);tone(880,0.25,0.25);tone(1100,0.5,0.45);try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}};
+const finishSound=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*0.22,0.4));};
+function flash(){const l=$("live");l.classList.add("flash");setTimeout(()=>l.classList.remove("flash"),1500);}
+
+// ---------------- Progress & alarms ----------------
+let warned=-1,lastBlock=null,finished=false;
+function advance(newDist,newElapsed){
+  const s=sec(),L=lenM();if(finished)return;
+  const j0=blockIdx(state.run.dist);
+  state.run.dist=Math.max(0,Math.min(L,newDist));state.run.elapsed=Math.max(0,newElapsed);
+  const j1=blockIdx(state.run.dist),w=state.base+s.blocks[j1][1];
+  if(state.run.dist>=L){finished=true;finishSound();flash();state.done[state.sel]=new Date().toISOString();stopEstimate();save();drawPlan();drawMaps(false);drawLive();return;}
+  if(j1>j0){changeSound();flash();warned=-1;}
+  else if(j1<7&&warned!==j1){const sw=(j1+1)*L/8;if((sw-state.run.dist)/curSpeed(w)<=10){warnSound();warned=j1;}}
+  drawLive();
+}
+function resetRun(){state.run={n:state.sel,dist:0,elapsed:0};warned=-1;finished=false;save();}
+
+// ---------------- Estimated mode ----------------
+let running=false,last=0,timer=null,wake=null,saveTick=0;
+async function lockScreen(){try{if(navigator.wakeLock&&!wake)wake=await navigator.wakeLock.request("screen");}catch(e){}}
+function releaseScreen(){try{wake&&wake.release();}catch(e){}wake=null;}
+function startEstimate(){audio();if(finished)resetRun();running=true;last=performance.now();timer=setInterval(()=>{const now=performance.now(),dt=Math.min(2,(now-last)/1000);last=now;const s=sec(),w=state.base+s.blocks[blockIdx(state.run.dist)][1];advance(state.run.dist+speedFor(w)*dt,state.run.elapsed+dt);if(++saveTick%20===0)save();},250);$("go").textContent="Pause";lockScreen();lockUI();}
+function stopEstimate(){if(!running)return;running=false;clearInterval(timer);$("go").textContent="Start";save();releaseScreen();lockUI();}
+function lockUI(){const busy=running||(pm.connected&&state.run.dist>0&&!finished);document.querySelectorAll("#grid button").forEach(b=>b.disabled=busy);$("baseW").disabled=busy;}
+
+// ---------------- PM5 Bluetooth ----------------
+// Concept2 PM5 Bluetooth Smart Interface: base UUID CE06xxxx-43E5-11E4-916C-0800200C9A66
+const U=s=>`ce06${s}-43e5-11e4-916c-0800200c9a66`;
+const pm={connected:false,device:null,dist:0,elapsed:0,speed:0,rpm:0,power:0,drag:0,offD:0,offT:0,lastDist:0};
+const u24=(dv,o)=>dv.getUint8(o)|(dv.getUint8(o+1)<<8)|(dv.getUint8(o+2)<<16);
+function onStatus(e){const dv=e.target.value;if(dv.byteLength<6)return;
+  pm.elapsed=u24(dv,0)/100;pm.dist=u24(dv,3)/10;if(dv.byteLength>18)pm.drag=dv.getUint8(18);
+  if(pm.dist<pm.lastDist-20){pm.offD=0;pm.offT=0;} // new piece started on the monitor
+  pm.lastDist=pm.dist;
+  advance(pm.dist-pm.offD,pm.elapsed-pm.offT);showPm();}
+function onStatus2(e){const dv=e.target.value;if(dv.byteLength<6)return;pm.speed=dv.getUint16(3,true)/1000;pm.rpm=dv.getUint8(5);showPm();}
+function onStroke2(e){const dv=e.target.value;if(dv.byteLength<5)return;pm.power=dv.getUint16(3,true);showPm();}
+function showPm(){$("pmW").textContent=pm.power||"–";$("pmR").textContent=pm.rpm||"–";$("pmD").textContent=pm.drag||"–";
+  if(!$("debug").hidden)$("debug").textContent=`PM5 distance ${pm.dist.toFixed(1)} m\nPM5 time ${pm.elapsed.toFixed(1)} s\nSpeed ${pm.speed.toFixed(2)} m/s\nCadence ${pm.rpm}\nPower ${pm.power} W\nDrag factor ${pm.drag}\nZero offset ${pm.offD.toFixed(1)} m`;}
+async function connect(){
+  audio();
+  if(!navigator.bluetooth){$("connMsg").textContent="This browser can’t use Bluetooth. Use Chrome on Android or a computer, or the Bluefy browser on iPhone.";return;}
+  try{
+    $("connMsg").textContent="Choose your PM5…";
+    const dev=await navigator.bluetooth.requestDevice({filters:[{namePrefix:"PM5"}],optionalServices:[U("0030"),U("0010")]});
+    pm.device=dev;dev.addEventListener("gattserverdisconnected",onDisconnect);
+    $("connMsg").textContent="Connecting…";
+    const server=await dev.gatt.connect();const svc=await server.getPrimaryService(U("0030"));
+    const subs=[["0031",onStatus],["0032",onStatus2],["0036",onStroke2]];
+    for(const[c,fn]of subs){try{const ch=await svc.getCharacteristic(U(c));ch.addEventListener("characteristicvaluechanged",fn);await ch.startNotifications();}catch(err){console.warn("PM5 characteristic",c,err);}}
+    stopEstimate();pm.connected=true;$("dot").classList.add("on");
+    $("connMsg").textContent="Connected to "+(dev.name||"PM5");$("connect").textContent="Disconnect";
+    lockScreen();drawMode();
+  }catch(err){$("connMsg").textContent=err&&err.name==="NotFoundError"?"No PM5 chosen.":"Couldn’t connect: "+(err&&err.message||err);}
+}
+function onDisconnect(){pm.connected=false;$("dot").classList.remove("on");$("connect").textContent="Connect PM5";$("connMsg").textContent="PM5 disconnected – using estimated distance";save();releaseScreen();drawMode();lockUI();}
+function disconnect(){try{pm.device&&pm.device.gatt.connected&&pm.device.gatt.disconnect();}catch(e){}onDisconnect();}
+
+// ---------------- GPX ----------------
+function loadGpx(text){
+  const doc=new DOMParser().parseFromString(text,"application/xml");
+  let pts=[...doc.getElementsByTagName("trkpt")];if(pts.length<2)pts=[...doc.getElementsByTagName("rtept")];
+  let ll=pts.map(p=>[parseFloat(p.getAttribute("lat")),parseFloat(p.getAttribute("lon"))]).filter(p=>!isNaN(p[0])&&!isNaN(p[1]));
+  if(ll.length<10)throw new Error("No route points found in that file.");
+  if(ll[0][1]>ll[ll.length-1][1])ll.reverse(); // make it run west to east
+  const step=Math.max(1,Math.ceil(ll.length/3000));ll=ll.filter((p,i)=>i%step===0||i===ll.length-1);
+  let cum=0;const out=[[ll[0][0],ll[0][1],0]];for(let i=1;i<ll.length;i++){cum+=hav(ll[i-1],ll[i]);out.push([ll[i][0],ll[i][1],cum]);}
+  const scale=222/cum;out.forEach(p=>p[2]=+(p[2]*scale).toFixed(3));out.forEach(p=>{p[0]=+p[0].toFixed(5);p[1]=+p[1].toFixed(5);});
+  return{route:out,km:cum};
+}
+$("gpxFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const g=loadGpx(r.result);route=g.route;usingGpx=true;try{localStorage.setItem(GKEY,JSON.stringify(route));}catch(err){}
+    drawPlan();drawMaps(true);drawLive();$("gpxMsg").textContent=`Loaded: ${g.km.toFixed(0)} km route line. Sections are scaled to fit it.`;}
+    catch(err){$("gpxMsg").textContent="Couldn’t read that file: "+err.message;}};r.readAsText(f);};
+$("gpxClear").onclick=()=>{route=WP.map(w=>[w[1],w[2],w[0]]);usingGpx=false;try{localStorage.removeItem(GKEY);}catch(e){}drawPlan();drawMaps(true);drawLive();};
+
+// ---------------- Controls ----------------
+$("connect").onclick=()=>pm.connected?disconnect():connect();
+$("go").onclick=()=>running?stopEstimate():startEstimate();
+$("zero").onclick=()=>{pm.offD=pm.dist;pm.offT=pm.elapsed;stopEstimate();resetRun();drawLive();lockUI();};
+$("test").onclick=()=>{changeSound();flash();};
+$("syncBtn").onclick=()=>{const v=parseFloat($("sync").value);if(isNaN(v))return;state.run.dist=Math.max(0,Math.min(lenM(),v*1000));warned=-1;$("sync").value="";save();drawLive();};
+$("grid").onclick=e=>{const b=e.target.closest("button[data-n]");if(!b||b.disabled)return;const n=+b.dataset.n;if(n===state.sel)return;
+  state.sel=n;resetRun();if(pm.connected){pm.offD=pm.dist;pm.offT=pm.elapsed;}drawPlan();drawMaps(true);drawLive();};
+$("baseW").value=state.base;
+$("baseW").onchange=()=>{const v=parseInt($("baseW").value,10);if(v>=60&&v<=300){state.base=v;save();drawPlan();drawLive();}else $("baseW").value=state.base;};
+$("markBtn").onclick=()=>{if(state.done[state.sel])delete state.done[state.sel];else state.done[state.sel]=new Date().toISOString();save();drawPlan();drawMaps(false);drawLive();};
+let armed=false;
+$("reset").onclick=()=>{if(!armed){armed=true;$("reset").textContent="Tap again to clear everything";setTimeout(()=>{armed=false;$("reset").textContent="Reset all progress";},4000);return;}
+  armed=false;stopEstimate();state.done={};state.sel=1;resetRun();$("reset").textContent="Reset all progress";drawPlan();drawMaps(true);drawLive();};
+$("dbgBtn").onclick=()=>{const d=$("debug");d.hidden=!d.hidden;$("dbgBtn").textContent=d.hidden?"Show PM5 data":"Hide PM5 data";showPm();};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&(running||pm.connected))lockScreen();});
+
+if(state.run.n!==state.sel)resetRun();
+drawPlan();initMaps();drawLive();drawMode();
+</script>
+</body>
+</html>
