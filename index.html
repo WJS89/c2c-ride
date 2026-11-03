@@ -10,157 +10,208 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#E9EEEC; --card:#F7F9F8; --ink:#1E2A2F; --muted:#5B6A70; --line:#C9D3D0;
-  --heather:#6E4673; --moss:#4D6A38; --sea:#2A6787; --fell:#9DAEA8; --done:#4D6A38; --amber:#8A6A3A; --water:#D3E2E8;
-  color-scheme:light; box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
-}
-@media (prefers-color-scheme:dark){
-  :root{
-    --paper:#141B1E; --card:#1C2529; --ink:#E4ECE9; --muted:#97A7AC; --line:#2E3B40;
-    --heather:#B58CBB; --moss:#8DB46E; --sea:#6FAFD0; --fell:#5A6E74; --done:#8DB46E; --amber:#C9A266; --water:#1A2C35;
-    color-scheme:dark;
-  }
+  --bg:#0F1619; --panel:rgba(15,22,25,0.88); --solid:#1A2427; --ink:#EEF3F1; --muted:#A9B8B4; --line:#2E3B40;
+  --d1:#5BB4E5; --d3:#6CC27A; --d5:#F2C14E; --d7:#F08A3C; --d9:#D9465B;
+  --ridden:#6CC27A; --you:#FFFFFF;
+  color-scheme:dark; box-sizing:border-box;
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.5 Barlow,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-.wrap{max-width:760px;margin:0 auto;padding:16px 14px 48px}
-h1{font:700 clamp(2rem,8vw,3rem)/1 "Barlow Condensed","Arial Narrow",sans-serif;margin:4px 0 2px}
-h2{font:700 1.35rem "Barlow Condensed","Arial Narrow",sans-serif;margin:20px 0 6px}
-.sub{color:var(--muted);margin:0 0 12px}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:6px}
-.mapbox{height:260px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
-#ovMap{height:210px}
-.leaflet-container{font-family:Barlow,sans-serif;background:var(--water)}
-.conn{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px}
-.dot{width:12px;height:12px;border-radius:50%;background:var(--fell)}
-.dot.on{background:var(--moss)}
-.pmvals{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto}
-.pmvals div{text-align:right}
-.pmvals b{display:block;font:700 1.4rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
-.pmvals span{font-size:.75rem;color:var(--muted)}
-.live{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:14px;margin:10px 0;transition:box-shadow .2s}
-.live.flash{box-shadow:0 0 0 4px var(--heather)}
-.damp{width:96px;height:96px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
-.damp b{font:700 3.4rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
-.damp span{font-size:.75rem;opacity:.9}
-.tw{font:700 2rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
-.tw small{font:500 1rem Barlow,sans-serif;color:var(--muted)}
-.terr{font-weight:600}
-.nextc{color:var(--muted);font-size:.92rem}
-.bar{grid-column:1/-1;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--moss);width:0}
-.readout{grid-column:1/-1;display:flex;justify-content:space-between;font:600 1.15rem "Barlow Condensed","Arial Narrow",sans-serif}
-.controls,.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
-.row label{font-weight:600}
-button{font:600 1rem Barlow,sans-serif;padding:10px 16px;border-radius:4px;border:1px solid var(--moss);background:var(--moss);color:var(--card);cursor:pointer}
-button.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-button:disabled{opacity:.45;cursor:default}
-button:focus-visible,input:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
-input[type=number]{width:86px;font:600 1rem Barlow,sans-serif;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink)}
-.hint{color:var(--muted);font-size:.85rem;margin:4px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
-.grid button{padding:8px 0;background:var(--card);color:var(--ink);border:1px solid var(--line);font:700 1.2rem "Barlow Condensed","Arial Narrow",sans-serif}
-.grid button.climb{border-bottom:4px solid var(--heather)}
-.grid button.isdone{background:var(--done);color:var(--card);border-color:var(--done)}
-.grid button.sel{outline:3px solid var(--sea);outline-offset:1px}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.4 Barlow,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}
+.cond{font-family:"Barlow Condensed","Arial Narrow",sans-serif}
+#stage{position:fixed;inset:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#map{position:absolute;inset:0;background:#1A2B24}
+.leaflet-container{background:#1A2B24;font-family:Barlow,sans-serif}
+#elevView{position:absolute;inset:0;background:#132026;display:flex;align-items:center;justify-content:center;padding:150px 40px 210px}
+#elevView svg{width:100%;height:100%;max-height:520px}
+.hud{position:absolute;z-index:500}
+.card{background:var(--panel);border-radius:14px;padding:14px 18px}
+#left{top:calc(16px + env(safe-area-inset-top,0px));left:16px;width:min(270px,42vw);display:flex;flex-direction:column;gap:10px}
+#damp{border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:2px;transition:background .4s,color .4s}
+#damp .lab{font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+#damp b{font:700 clamp(84px,12vw,150px)/.9 "Barlow Condensed","Arial Narrow",sans-serif}
+#damp .ter{font-size:18px;font-weight:600}
+#damp .dfok{font-size:14px;font-weight:600;opacity:.9}
+.flashy{animation:flash .5s 4}
+@keyframes flash{50%{box-shadow:0 0 0 8px #fff}}
+@media (prefers-reduced-motion:reduce){.flashy{animation:none;outline:6px solid #fff}}
+.k{font-size:14px;color:var(--muted)}
+.big{font:700 48px/1 "Barlow Condensed","Arial Narrow",sans-serif}
+#coach{border-left:0;font-size:17px;font-weight:600;min-height:20px}
+#coach .k{font-weight:400}
+#tabs{top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;gap:4px;background:var(--panel);border-radius:999px;padding:5px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 32px)}
+#tabs button{background:transparent;color:#C4D0CC;border:0;border-radius:999px;padding:9px 15px;font:500 15px Barlow,sans-serif;cursor:pointer;min-height:40px}
+#tabs button.on{background:var(--ink);color:#0F1619;font-weight:600}
+#tabs button.pin{outline:2px solid var(--d5)}
+#tabs .nextv{color:var(--muted);font-size:13px;padding:0 10px;align-self:center}
+#right{top:calc(16px + env(safe-area-inset-top,0px));right:16px;display:flex;flex-direction:column;gap:10px;width:min(360px,44vw)}
+#stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+#stats .big{font-size:44px}
+#speedBig{font-size:64px!important}
+.pmline{grid-column:1/-1;font-size:13px;color:var(--muted)}
+#board{display:flex;flex-direction:column;gap:6px;font-size:15px}
+#board .row{display:flex;align-items:center;gap:8px}
+#board .row i{width:12px;height:12px;border-radius:50%;flex:none}
+#board .row span:last-child{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+#bottom{left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.toprow{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+#secName{font:600 26px "Barlow Condensed","Arial Narrow",sans-serif}
+#nextTxt{font-size:18px}
+#bar{position:relative;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;height:28px}
+#bar .seg{position:relative;border-radius:3px;overflow:hidden}
+#bar .seg .bg{position:absolute;inset:0;opacity:.28}
+#bar .seg .fill{position:absolute;left:0;top:0;bottom:0;width:0}
+#ticks{position:absolute;left:0;right:0;top:-8px;height:44px;pointer-events:none}
+#ticks i{position:absolute;top:0;width:4px;height:44px;border-radius:2px;transform:translateX(-2px)}
+#ticks i.me{width:6px;background:#fff;box-shadow:0 0 0 2px #0F1619;transform:translateX(-3px)}
+.botrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.botrow .t{font:600 28px "Barlow Condensed","Arial Narrow",sans-serif;font-variant-numeric:tabular-nums}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+button.b{font:600 15px Barlow,sans-serif;padding:9px 14px;border-radius:8px;border:1px solid #3B4A50;background:#22303A;color:var(--ink);cursor:pointer;min-height:42px}
+button.b.pri{background:var(--d3);border-color:var(--d3);color:#0B1A0E}
+button.b:focus-visible,#tabs button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--d1);outline-offset:2px}
+#featureCard{top:42%;left:50%;transform:translate(10%,-50%);max-width:320px}
+#featureCard .t{font:700 30px/1.1 "Barlow Condensed","Arial Narrow",sans-serif}
+#warn{top:calc(80px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);border-radius:14px;padding:14px 22px;display:flex;align-items:center;gap:16px}
+#warn .t{font:700 64px/1 "Barlow Condensed","Arial Narrow",sans-serif}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--solid);z-index:900;overflow-y:auto;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(40px + env(safe-area-inset-bottom,0px));box-shadow:-10px 0 30px rgba(0,0,0,.4)}
+#drawer h2{font:700 22px "Barlow Condensed","Arial Narrow",sans-serif;margin:22px 0 8px}
+#drawer h2:first-of-type{margin-top:4px}
+.set{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.set label{font-weight:600;min-width:120px}
+.set input[type=number],select{width:96px;font:600 15px Barlow,sans-serif;padding:8px;border:1px solid var(--line);border-radius:6px;background:#0F1619;color:var(--ink)}
+.set input[type=range]{flex:1;accent-color:var(--d7)}
+.chk{display:flex;gap:10px;align-items:center;margin:6px 0;font-weight:500}
+.chk input{width:20px;height:20px;accent-color:var(--d7)}
+.chk i{width:12px;height:12px;border-radius:50%}
+.hint{color:var(--muted);font-size:13px;margin:4px 0}
+.grid13{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:6px}
+.grid13 button{padding:8px 0;background:#0F1619;color:var(--ink);border:1px solid var(--line);border-radius:6px;font:700 18px "Barlow Condensed","Arial Narrow",sans-serif;cursor:pointer;min-height:42px}
+.grid13 button.climb{border-bottom:4px solid var(--d9)}
+.grid13 button.done{background:var(--d3);color:#0B1A0E}
+.grid13 button.sel{outline:3px solid var(--d1)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:6px 5px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:500}
+td.w{white-space:normal}
+.chip{display:inline-block;min-width:26px;text-align:center;border-radius:4px;padding:1px 4px;font-weight:700;color:#0F1619}
 .scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.95rem}
-th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{color:var(--muted);font-weight:500;font-size:.85rem}
-td.t{white-space:normal}
-tr.cur td{background:var(--water)}
-.d{display:inline-block;min-width:1.8rem;text-align:center;font-weight:700;border-radius:3px;padding:1px 4px;color:#fff}
-.w-up{color:var(--heather);font-weight:600}.w-dn{color:var(--sea);font-weight:600}
-.stats{display:flex;gap:22px;flex-wrap:wrap;margin:6px 2px}
-.stat b{display:block;font:700 1.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif}
-.stat span{color:var(--muted);font-size:.85rem}
-#elev{display:block;width:100%;height:auto;margin-top:6px}
-#debug{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--muted);white-space:pre-wrap;margin-top:8px}
-@media (prefers-reduced-motion:reduce){.live{transition:none}}
+#debrief{position:fixed;inset:0;z-index:950;background:rgba(5,10,12,.75);display:flex;align-items:center;justify-content:center;padding:20px}
+#debrief .box{background:var(--solid);border-radius:16px;max-width:760px;width:100%;max-height:100%;overflow-y:auto;padding:22px}
+#debrief h2{font:700 34px/1 "Barlow Condensed","Arial Narrow",sans-serif;margin:0 0 6px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.kpis div{background:#0F1619;border-radius:10px;padding:10px 12px}
+.kpis b{display:block;font:700 30px/1.1 "Barlow Condensed","Arial Narrow",sans-serif}
+.pos{color:var(--d3)}.neg{color:#FF7A8A}
+#debugTxt{font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--muted);white-space:pre-wrap}
+@media (max-width:820px){
+  #left{width:min(200px,46vw)} #right{width:min(230px,48vw)} #stats .big{font-size:32px} #speedBig{font-size:44px!important}
+  #board{display:none} #tabs{top:auto;bottom:calc(200px + env(safe-area-inset-bottom,0px))} #featureCard{display:none}
+  #warn .t{font-size:44px} #warn{top:auto;bottom:calc(250px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>Whitehaven to Tynemouth</h1>
-  <p class="sub" id="secTitle"></p>
+<div id="stage">
+  <div id="map" role="img" aria-label="Route map"></div>
+  <div id="elevView" hidden><svg id="elevSvg" viewBox="0 0 1000 400" preserveAspectRatio="none" role="img" aria-label="Elevation profile of this section"></svg></div>
 
-  <div class="panel conn">
-    <span class="dot" id="dot"></span>
-    <button id="connect">Connect PM5</button>
-    <span id="connMsg" class="hint">Not connected – using estimated distance</span>
-    <div class="pmvals">
-      <div><b id="pmW">–</b><span>watts</span></div>
-      <div><b id="pmR">–</b><span>rpm</span></div>
-      <div><b id="pmD">–</b><span>drag factor</span></div>
+  <div class="hud" id="left">
+    <div id="damp"><span class="lab">Damper</span><b id="dVal">4</b><span class="ter" id="tVal"></span><span class="dfok" id="dfOk"></span></div>
+    <div class="card"><div class="k">Target</div><div class="big" id="wVal">130 W</div></div>
+    <div class="card" id="coach" aria-live="polite"><span class="k">Coach</span><div id="coachTxt">Ready when you are.</div></div>
+  </div>
+
+  <div class="hud" id="tabs" role="group" aria-label="Map view">
+    <button data-v="section" class="on">This section</button>
+    <button data-v="closeup">Close-up</button>
+    <button data-v="route">Whole route</button>
+    <button data-v="elev">Elevation</button>
+    <button data-v="auto" id="autoBtn" hidden>Auto</button>
+  </div>
+
+  <div class="hud" id="right">
+    <div class="card" id="stats">
+      <div style="grid-column:1/-1"><div class="k">Road speed</div><div class="big" id="speedBig">–</div></div>
+      <div><div class="k">Watts</div><div class="big" id="pmW">–</div></div>
+      <div><div class="k">RPM</div><div class="big" id="pmR">–</div></div>
+      <div><div class="k">Drag factor</div><div class="big" id="pmD">–</div></div>
+      <div><div class="k">Gradient</div><div class="big" id="grad">–</div></div>
+      <div class="pmline" id="pmLine">PM5 distance –</div>
+    </div>
+    <div class="card" id="board" aria-live="off"></div>
+  </div>
+
+  <div class="hud card" id="featureCard" hidden><div class="k">Coming up</div><div class="t" id="fName"></div><div id="fNote"></div></div>
+  <div class="hud" id="warn" hidden><span class="t" id="warnT">0:10</span><div><div class="k" style="color:inherit;font-weight:600;text-transform:uppercase;letter-spacing:.08em">Change coming</div><div class="cond" style="font-size:34px;font-weight:700;line-height:1.05" id="warnD"></div><div style="font-weight:600" id="warnTer"></div></div></div>
+
+  <div class="hud card" id="bottom">
+    <div class="toprow"><span id="secName"></span><span id="nextTxt"></span></div>
+    <div id="bar"><div id="ticks"></div></div>
+    <div class="botrow">
+      <span class="t" id="clock">0:00</span>
+      <span id="planTxt" class="k" style="font-size:16px"></span>
+      <div class="btns">
+        <button class="b" id="connect">Connect PM5</button>
+        <button class="b pri" id="go">Start</button>
+        <button class="b" id="demo">Demo ride</button>
+        <button class="b" id="setBtn" aria-expanded="false" aria-controls="drawer">Settings</button>
+      </div>
+      <span class="t" id="dist">0.0 / 0 km</span>
     </div>
   </div>
-
-  <div class="panel live" id="live" aria-live="polite">
-    <div class="damp" id="damp"><span>Damper</span><b id="dVal">4</b></div>
-    <div>
-      <div class="tw"><span id="wVal">130 W</span> <small>target</small></div>
-      <div class="terr" id="tVal"></div>
-      <div class="nextc" id="nVal"></div>
-    </div>
-    <div class="bar"><i id="barI"></i></div>
-    <div class="readout"><span id="clock">0:00</span><span id="dist">0.0 / 0 km</span></div>
-  </div>
-
-  <h2 id="secMapH">This section</h2>
-  <div class="mapbox" id="secMap"></div>
-
-  <h2>Whole route</h2>
-  <div class="mapbox" id="ovMap"></div>
-  <svg id="elev" viewBox="0 0 1000 120" role="img" aria-label="Route elevation profile"></svg>
-
-  <div class="controls">
-    <button id="go">Start</button>
-    <button class="ghost" id="zero">Zero distance here</button>
-    <button class="ghost" id="test">Test alarm</button>
-  </div>
-  <p class="hint" id="modeHint"></p>
-
-  <div class="row" id="syncRow">
-    <label for="sync">PM5 distance</label>
-    <input id="sync" type="number" step="0.1" min="0" inputmode="decimal" placeholder="km">
-    <button class="ghost" id="syncBtn">Sync</button>
-  </div>
-
-  <div class="row">
-    <label for="baseW">Base watts</label>
-    <input id="baseW" type="number" min="60" max="300" step="5" value="130" inputmode="numeric">
-  </div>
-
-  <h2>Sections</h2>
-  <div class="stats">
-    <div class="stat"><b id="kmDone">0</b><span>of 222 km ridden</span></div>
-    <div class="stat"><b id="secDone">0</b><span>of 13 sections</span></div>
-  </div>
-  <div class="grid" id="grid"></div>
-
-  <h2 id="planH">Plan</h2>
-  <div class="scroll"><table><thead><tr><th>Switch at</th><th>Terrain</th><th>Damper</th><th>Target</th></tr></thead><tbody id="plan"></tbody></table></div>
-
-  <h2>Route file</h2>
-  <p class="hint" id="gpxMsg"></p>
-  <div class="row">
-    <input type="file" id="gpxFile" accept=".gpx,application/gpx+xml">
-    <button class="ghost" id="gpxClear">Use built-in route</button>
-  </div>
-
-  <div class="controls">
-    <button class="ghost" id="markBtn">Mark section done</button>
-    <button class="ghost" id="reset">Reset all progress</button>
-    <button class="ghost" id="dbgBtn">Show PM5 data</button>
-  </div>
-  <div id="debug" hidden></div>
 </div>
 
+<aside id="drawer" hidden aria-label="Settings">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2>Settings</h2><button class="b" id="closeSet">Close</button></div>
+
+  <h2>Section</h2>
+  <div class="grid13" id="grid"></div>
+  <p class="hint" id="doneTxt"></p>
+  <div class="btns" style="margin-top:8px"><button class="b" id="restart">Restart section</button><button class="b" id="markBtn">Mark done</button></div>
+  <div class="scroll" style="margin-top:10px"><table><thead><tr><th>From</th><th>Terrain</th><th>Damper</th><th>Target</th></tr></thead><tbody id="plan"></tbody></table></div>
+
+  <h2>You</h2>
+  <div class="set"><label for="weight">Weight (kg)</label><input id="weight" type="number" min="40" max="200" step="1" inputmode="numeric"></div>
+  <div class="set"><label for="baseW">Base watts</label><input id="baseW" type="number" min="60" max="400" step="5" inputmode="numeric"></div>
+  <div class="set"><label for="units">Units</label><select id="units"><option value="km">Kilometres</option><option value="mi">Miles</option></select></div>
+
+  <h2>Ghost riders</h2>
+  <div id="ghostList"></div>
+  <div class="btns"><button class="b" id="ghostAll">All on</button><button class="b" id="ghostNone">All off</button></div>
+
+  <h2>Alarm</h2>
+  <div class="set"><label for="vol">Volume</label><input id="vol" type="range" min="0" max="100" step="5"></div>
+  <label class="chk"><input type="checkbox" id="voice"> Spoken callouts</label>
+  <label class="chk"><input type="checkbox" id="coachVoice"> Coach speaks too</label>
+  <button class="b" id="test">Test alarm</button>
+
+  <h2>Drag factor</h2>
+  <p class="hint">Set the lever, pedal for 20 seconds, then record. Once recorded, the damper tile confirms when you’re on the right setting.</p>
+  <div class="set"><label for="calD">Damper</label><select id="calD"></select><button class="b" id="calBtn">Record current</button></div>
+  <div class="scroll"><table><thead><tr><th>Damper</th><th>Drag factor</th></tr></thead><tbody id="calTbl"></tbody></table></div>
+
+  <h2>Route</h2>
+  <p class="hint" id="gpxMsg"></p>
+  <input type="file" id="gpxFile" accept=".gpx,application/gpx+xml">
+  <div class="btns" style="margin-top:8px"><button class="b" id="gpxClear">Use built-in route</button></div>
+
+  <h2>PM5</h2>
+  <div class="btns"><button class="b" id="zero">Zero PM5 distance</button><button class="b" id="dbgBtn">Show raw data</button></div>
+  <div id="debugTxt" hidden></div>
+
+  <h2>Progress</h2>
+  <button class="b" id="reset">Reset all progress</button>
+  <p class="hint">Road speed comes from your watts, the gradient and your weight. Gradients are approximate, from route elevation data.</p>
+</aside>
+
+<div id="debrief" hidden role="dialog" aria-modal="true" aria-labelledby="dbTitle"><div class="box" id="dbBox"></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-// ---------------- Route plan ----------------
+// ======================= CONFIG =======================
+const TILES = true;      // false where remote map tiles can't load
+const DEMO_X = 40;       // demo runs 40x faster than real time
 const SECTIONS = [
  {from:"Whitehaven",to:"Rowrah",a:0,b:14,blocks:[[3,-10,"Harbour warm-up"],[3,0,"Railway path"],[4,0,"Railway path"],[4,5,"Gentle drag"],[4,5,"Gentle drag"],[3,0,"Cleator Moor"],[4,5,"Rise towards Rowrah"],[3,0,"Into Rowrah"]]},
  {from:"Rowrah",to:"Lorton",a:14,b:32,blocks:[[4,0,"Lanes past Lamplugh"],[5,10,"Rolling"],[6,15,"Climb above Loweswater"],[5,10,"Over the top"],[3,-10,"Descent to Loweswater"],[4,0,"Lakeside"],[5,5,"Rolling"],[4,0,"Into Lorton"]]},
@@ -176,218 +227,398 @@ const SECTIONS = [
  {from:"Swalwell",to:"Wallsend",a:194,b:210,blocks:[[3,0,"Tyne bank"],[4,5,"Short rises"],[3,0,"Into Newcastle"],[3,0,"Quayside"],[4,5,"Climb off the quay"],[3,0,"East Newcastle"],[4,0,"Riverside"],[3,0,"Wallsend"]]},
  {from:"Wallsend",to:"Tynemouth",a:210,b:222,blocks:[[3,0,"Riverside path"],[3,0,"North Shields"],[4,5,"Rise to the Fish Quay"],[3,0,"Fish Quay"],[4,5,"Up to the priory"],[3,0,"Tynemouth"],[3,-5,"Sea front"],[2,-10,"Warm-down at the finish"]]}
 ];
-// Built-in route: rough waypoints [planKm, lat, lon]. A GPX file replaces these with the real line.
-const WP=[[0,54.549,-3.587],[8,54.521,-3.515],[14,54.567,-3.444],[19,54.583,-3.380],[27,54.588,-3.335],[32,54.625,-3.315],[38,54.609,-3.228],[44,54.602,-3.193],[50,54.601,-3.135],[57,54.620,-3.054],[68,54.656,-2.982],[78,54.667,-2.865],[88,54.664,-2.752],[96,54.693,-2.664],[105,54.738,-2.638],[112,54.762,-2.555],[122,54.767,-2.411],[128,54.787,-2.340],[138,54.805,-2.218],[143,54.797,-2.160],[148,54.776,-2.098],[155,54.783,-2.030],[165,54.812,-1.937],[175,54.853,-1.832],[185,54.920,-1.744],[194,54.956,-1.690],[202,54.968,-1.605],[210,54.990,-1.533],[218,55.009,-1.449],[222,55.018,-1.420]];
-const PROFILE=[[0,5],[14,150],[25,120],[32,100],[38,318],[44,80],[50,80],[57,180],[68,240],[78,230],[88,150],[96,130],[105,200],[112,580],[118,400],[122,340],[128,450],[132,560],[138,400],[143,609],[148,330],[152,500],[155,450],[175,250],[185,60],[194,10],[210,20],[222,10]];
+const WP = [[0,54.549,-3.587],[8,54.521,-3.515],[14,54.567,-3.444],[19,54.583,-3.380],[27,54.588,-3.335],[32,54.625,-3.315],[38,54.609,-3.228],[44,54.602,-3.193],[50,54.601,-3.135],[57,54.620,-3.054],[68,54.656,-2.982],[78,54.667,-2.865],[88,54.664,-2.752],[96,54.693,-2.664],[105,54.738,-2.638],[112,54.762,-2.555],[122,54.767,-2.411],[128,54.787,-2.340],[138,54.805,-2.218],[143,54.797,-2.160],[148,54.776,-2.098],[155,54.783,-2.030],[165,54.812,-1.937],[175,54.853,-1.832],[185,54.920,-1.744],[194,54.956,-1.690],[202,54.968,-1.605],[210,54.990,-1.533],[218,55.009,-1.449],[222,55.018,-1.420]];
+const PROFILE = [[0,5],[14,150],[25,120],[32,100],[38,318],[44,80],[50,80],[57,180],[68,240],[78,230],[88,150],[96,130],[105,200],[112,580],[118,400],[122,340],[128,450],[132,560],[138,400],[143,609],[148,330],[152,500],[155,450],[175,250],[185,60],[194,10],[210,20],[222,10]];
+const FEATURES=[[0,"Whitehaven","The start: harbour and the old railway path inland."],[38,"Whinlatter Pass","Forest summit at 318 m, the first real climb."],[50,"Keswick","Lakeland town at the head of Derwentwater."],[88,"Penrith","Market town and gateway to the Eden valley."],[112,"Hartside summit, 580 m","Top of the climb, then the long descent towards Alston Moor."],[128,"Nenthead","Old lead-mining village, one of England’s highest."],[138,"Allenheads","Heart of the North Pennines."],[143,"Black Hill, 609 m","Highest point of the whole route."],[148,"Rookhope","Steep drop in, steep climb out."],[175,"Consett","Off the moors and onto the Derwent Walk."],[202,"Newcastle Quayside","Under the Tyne bridges."],[222,"Tynemouth","The finish, by the priory."]];
+const GHOSTS=[
+ {id:"beginner",name:"Beginner",wkg:1.2,col:"#B9C7C2"},
+ {id:"steady",name:"Steady",wkg:null,col:"#C9A0DC"},
+ {id:"club",name:"Club rider",wkg:2.5,col:"#FF8FB1"},
+ {id:"elite",name:"Elite",wkg:4.0,col:"#FFD54A"},
+ {id:"best",name:"Your best",wkg:null,col:"#00E5FF"}];
+const PHYS={crr:0.005,cda:0.40,rho:1.225,g:9.81,bike:10,vmax:16.7,tau:3};
 
-// BikeErg: watts ≈ 0.35 × speed³ (m/s), used only for estimated mode
-const speedFor=w=>Math.cbrt(Math.max(w,20)/0.35);
-
-// ---------------- State ----------------
-const KEY="c2c-bikeerg-v1", GKEY="c2c-bikeerg-gpx";
-let state={base:130,done:{},sel:1,run:{n:1,dist:0,elapsed:0}};
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object"){state.base=s.base||130;state.done=s.done||{};state.sel=s.sel||1;state.run=s.run||{n:state.sel,dist:0,elapsed:0};}}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
-let route=WP.map(w=>[w[1],w[2],w[0]]); let usingGpx=false;
+// ======================= STATE =======================
+const KEY="c2c-bikeerg-v3",GKEY="c2c-bikeerg-gpx";
+const S={base:130,weight:95,units:"km",vol:90,voice:true,coachVoice:true,ghosts:{beginner:false,steady:true,club:true,elite:false,best:true},dfCal:{},done:{},sel:1,best:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object")Object.assign(S,s,{ghosts:Object.assign({},S.ghosts,s.ghosts||{})});}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let route=WP.map(w=>[w[1],w[2],w[0],null]),usingGpx=false;
 try{const g=JSON.parse(localStorage.getItem(GKEY)||"null");if(Array.isArray(g)&&g.length>10){route=g;usingGpx=true;}}catch(e){}
 
 const $=id=>document.getElementById(id);
-const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const colour=d=>d>=8?"var(--heather)":d>=6?"var(--amber)":d<=2?"var(--sea)":"var(--moss)";
-const fmt=s=>{s=Math.max(0,Math.round(s));const m=Math.floor(s/60),r=s%60;return m+":"+String(r).padStart(2,"0");};
-const sec=()=>SECTIONS[state.sel-1];
+const sec=()=>SECTIONS[S.sel-1];
 const lenM=()=>(sec().b-sec().a)*1000;
+const DCOL=d=>d<=2?"#5BB4E5":d<=4?"#6CC27A":d<=6?"#F2C14E":d<=8?"#F08A3C":"#D9465B";
+const DINK=d=>d>=9?"#FFFFFF":"#0F1619";
+const fmt=s=>{s=Math.max(0,Math.round(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),r=s%60;return(h?h+":"+String(m).padStart(2,"0"):m)+":"+String(r).padStart(2,"0");};
+const fmtGap=s=>(s<0?"−":"+")+fmt(Math.abs(s));
+const KMMI=0.621371;
+const dU=m=>S.units==="mi"?(m/1000*KMMI):(m/1000);
+const uD=()=>S.units==="mi"?"mi":"km";
+const sU=v=>S.units==="mi"?v*3.6*KMMI:v*3.6;
+const uS=()=>S.units==="mi"?"mph":"km/h";
+const mass=()=>S.weight+PHYS.bike;
+const targetW=j=>S.base+sec().blocks[j][1];
 
-// ---------------- Route geometry ----------------
+// ======================= ELEVATION & PHYSICS =======================
+let ELEV=null; // elevation every 50 m of plan distance, smoothed
+function buildElev(){
+  const n=222*20+1,raw=new Float32Array(n);
+  const hasEle=usingGpx&&route.some(p=>p[3]!=null);
+  for(let i=0;i<n;i++){const k=i/20;raw[i]=hasEle?eleFromRoute(k):eleFromProfile(k);}
+  ELEV=new Float32Array(n);
+  for(let i=0;i<n;i++){let s=0,c=0;for(let j=-6;j<=6;j++){const q=i+j;if(q>=0&&q<n){s+=raw[q];c++;}}ELEV[i]=s/c;}
+}
+function eleFromProfile(k){for(let i=1;i<PROFILE.length;i++){const[a,ea]=PROFILE[i-1],[b,eb]=PROFILE[i];if(k<=b)return ea+(eb-ea)*(k-a)/(b-a);}return 10;}
+function eleFromRoute(k){let last=null;for(let i=1;i<route.length;i++){const p=route[i-1],q=route[i];if(k<=q[2]){const e1=p[3]??q[3]??0,e2=q[3]??e1,t=q[2]===p[2]?0:(k-p[2])/(q[2]-p[2]);return e1+(e2-e1)*t;}last=q;}return last&&last[3]!=null?last[3]:0;}
+function elevAt(k){const x=Math.max(0,Math.min(222,k))*20,i=Math.floor(x),f=x-i;return i>=ELEV.length-1?ELEV[ELEV.length-1]:ELEV[i]*(1-f)+ELEV[i+1]*f;}
+function gradeAt(k){return Math.max(-0.15,Math.min(0.15,(elevAt(k+0.1)-elevAt(k-0.1))/200));}
+function roadSpeed(P,grade){
+  const th=Math.atan(grade),F=mass()*PHYS.g*(Math.sin(th)+PHYS.crr*Math.cos(th)),A=0.5*PHYS.rho*PHYS.cda;
+  const f=v=>A*v*v*v+F*v-P;
+  let lo=0.2,hi=PHYS.vmax;if(f(hi)<0)return hi;if(f(lo)>0)return lo;
+  for(let i=0;i<36;i++){const m=(lo+hi)/2;if(f(m)>0)hi=m;else lo=m;}return(lo+hi)/2;
+}
+// simulate a rider through the current section, returns distance (m) at each second
+function simulate(powerForBlock){
+  const s=sec(),L=lenM(),out=[0];let d=0,v=0;
+  for(let t=1;t<6*3600&&d<L;t++){const j=Math.min(7,Math.floor(d/(L/8)));const k=s.a+d/1000;
+    const vs=roadSpeed(powerForBlock(j),gradeAt(k));v+=(vs-v)/PHYS.tau;d=Math.min(L,d+v);out.push(d);}
+  return out;
+}
+const distAtTime=(arr,t)=>{if(!arr)return 0;if(t>=arr.length-1)return arr[arr.length-1];const i=Math.floor(t),f=t-i;return arr[i]*(1-f)+arr[i+1]*f;};
+function timeAtDist(arr,d){if(!arr)return Infinity;if(d>=arr[arr.length-1])return arr.length-1;let lo=0,hi=arr.length-1;while(hi-lo>1){const m=(lo+hi)>>1;if(arr[m]<d)lo=m;else hi=m;}const a=arr[lo],b=arr[hi];return lo+(b===a?0:(d-a)/(b-a));}
+let PLAN=null,GH={};
+function precompute(){
+  PLAN=simulate(j=>targetW(j));
+  GH={};
+  GHOSTS.forEach(g=>{
+    if(g.id==="steady")GH.steady=PLAN;
+    else if(g.id==="best"){const b=S.best[S.sel];if(b&&b.trace){const arr=[0];for(let i=1;i<b.trace.length;i++){const[t0,d0]=b.trace[i-1],[t1,d1]=b.trace[i];for(let t=Math.ceil(t0+1e-9);t<=t1;t++)arr[t]=d0+(d1-d0)*(t-t0)/(t1-t0);}GH.best=arr;}}
+    else GH[g.id]=simulate(j=>g.wkg*S.weight*targetW(j)/S.base);
+  });
+}
+
+// ======================= ROUTE GEOMETRY =======================
 function posAt(k){for(let i=1;i<route.length;i++){const[la1,lo1,k1]=route[i-1],[la2,lo2,k2]=route[i];if(k<=k2){const t=k2===k1?0:(k-k1)/(k2-k1);return[la1+(la2-la1)*t,lo1+(lo2-lo1)*t];}}const l=route[route.length-1];return[l[0],l[1]];}
 function slice(a,b){return[posAt(a),...route.filter(p=>p[2]>a&&p[2]<b).map(p=>[p[0],p[1]]),posAt(b)];}
 function hav(a,b){const R=6371,r=Math.PI/180,dLa=(b[0]-a[0])*r,dLo=(b[1]-a[1])*r;const h=Math.sin(dLa/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
 
-// ---------------- Maps ----------------
-let ovMap=null,secMap=null,L_=window.L;
-let ov={},sm={};
-function tiles(){return L_.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"&copy; OpenStreetMap contributors"});}
-function initMaps(){
-  if(!L_){$("secMap").textContent="Map couldn’t load – check your connection.";$("ovMap").textContent="";return;}
-  ovMap=L_.map("ovMap",{zoomControl:false,scrollWheelZoom:false});tiles().addTo(ovMap);
-  secMap=L_.map("secMap",{zoomControl:true,scrollWheelZoom:false});tiles().addTo(secMap);
-  drawMaps(true);
+// ======================= MAP =======================
+const L_=window.L;let map=null,osm=null,sat=null,lay=[],ridden=null,me=null,ghostMk={};
+function initMap(){
+  if(!L_){$("map").textContent="Map couldn’t load. Check your connection.";return;}
+  map=L_.map("map",{zoomControl:false,attributionControl:TILES,scrollWheelZoom:false,keyboard:false});
+  if(TILES){osm=L_.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"&copy; OpenStreetMap contributors"});
+    sat=L_.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:18,attribution:"Imagery &copy; Esri"});osm.addTo(map);}
+  drawRoute();
 }
-function drawMaps(refit){
-  if(!ovMap)return;
-  const fell=css("--fell")||"#9DAEA8",done=css("--done")||"#4D6A38",heather=css("--heather")||"#6E4673",sea=css("--sea")||"#2A6787";
-  [ov,sm].forEach(g=>{(g.layers||[]).forEach(l=>l.remove());g.layers=[];});
-  const full=route.map(p=>[p[0],p[1]]), s=sec();
-  // overview
-  ov.layers.push(L_.polyline(full,{color:fell,weight:4}).addTo(ovMap));
-  SECTIONS.forEach((q,i)=>{if(state.done[i+1])ov.layers.push(L_.polyline(slice(q.a,q.b),{color:done,weight:5}).addTo(ovMap));});
-  ov.layers.push(L_.polyline(slice(s.a,s.b),{color:heather,weight:6}).addTo(ovMap));
-  ov.me=L_.circleMarker(posAt(s.a),{radius:6,color:"#fff",weight:2,fillColor:sea,fillOpacity:1}).addTo(ovMap);ov.layers.push(ov.me);
-  // section
-  sm.layers.push(L_.polyline(full,{color:fell,weight:3,opacity:.7}).addTo(secMap));
-  const segLine=L_.polyline(slice(s.a,s.b),{color:heather,weight:6}).addTo(secMap);sm.layers.push(segLine);
-  // block switch points
-  for(let j=1;j<8;j++){const k=s.a+j*(s.b-s.a)/8;sm.layers.push(L_.circleMarker(posAt(k),{radius:4,color:heather,weight:2,fillColor:"#fff",fillOpacity:1}).bindTooltip("Damper "+s.blocks[j][0]).addTo(secMap));}
-  sm.layers.push(L_.circleMarker(posAt(s.a),{radius:6,color:heather,fillColor:heather,fillOpacity:1}).bindTooltip(s.from).addTo(secMap));
-  sm.layers.push(L_.circleMarker(posAt(s.b),{radius:6,color:done,fillColor:done,fillOpacity:1}).bindTooltip(s.to).addTo(secMap));
-  sm.me=L_.circleMarker(posAt(s.a),{radius:9,color:"#fff",weight:3,fillColor:sea,fillOpacity:1}).addTo(secMap);sm.layers.push(sm.me);
-  if(refit){ovMap.fitBounds(L_.polyline(full).getBounds(),{padding:[12,12]});secMap.fitBounds(segLine.getBounds(),{padding:[24,24]});}
+function drawRoute(){
+  if(!map)return;lay.forEach(l=>l.remove());lay=[];ghostMk={};
+  const s=sec(),full=route.map(p=>[p[0],p[1]]);
+  lay.push(L_.polyline(full,{color:"#7D8F8A",weight:4,opacity:.8}).addTo(map));
+  SECTIONS.forEach((q,i)=>{if(S.done[i+1])lay.push(L_.polyline(slice(q.a,q.b),{color:"#6CC27A",weight:5}).addTo(map));});
+  lay.push(L_.polyline(slice(s.a,s.b),{color:"#FFFFFF",weight:6,opacity:.85,dashArray:"2 12",lineCap:"round"}).addTo(map));
+  for(let j=1;j<8;j++){const k=s.a+j*(s.b-s.a)/8,d=s.blocks[j][0];lay.push(L_.circleMarker(posAt(k),{radius:7,color:"#0F1619",weight:3,fillColor:DCOL(d),fillOpacity:1}).bindTooltip("Damper "+d).addTo(map));}
+  ridden=L_.polyline([posAt(s.a)],{color:"#6CC27A",weight:8,lineCap:"round"}).addTo(map);lay.push(ridden);
+  GHOSTS.forEach(g=>{ghostMk[g.id]=L_.circleMarker(posAt(s.a),{radius:8,color:"#0F1619",weight:2,fillColor:g.col,fillOpacity:1});lay.push(ghostMk[g.id]);});
+  me=L_.circleMarker(posAt(s.a),{radius:11,color:"#5BB4E5",weight:4,fillColor:"#FFFFFF",fillOpacity:1}).addTo(map);lay.push(me);
+  view.cur=null;applyView(view.want||"section",true);
 }
-function moveMarkers(k){const p=posAt(k);if(ov.me)ov.me.setLatLng(p);if(sm.me)sm.me.setLatLng(p);}
-
-// ---------------- Elevation strip ----------------
-const ex=k=>10+k/222*980, ey=m=>110-(m/650)*95;
-function elev(k){for(let i=1;i<PROFILE.length;i++){const[a,ea]=PROFILE[i-1],[b,eb]=PROFILE[i];if(k<=b)return ea+(eb-ea)*(k-a)/(b-a);}return 10;}
-function elArea(a,b){const p=[[a,elev(a)],...PROFILE.filter(q=>q[0]>a&&q[0]<b),[b,elev(b)]];return "M"+ex(a)+",110 "+p.map(q=>"L"+ex(q[0]).toFixed(1)+","+ey(q[1]).toFixed(1)).join(" ")+" L"+ex(b)+",110 Z";}
-function drawElev(){const s=sec();let h=`<path d="${elArea(0,222)}" fill="var(--fell)"/>`;
-  SECTIONS.forEach((q,i)=>{if(state.done[i+1])h+=`<path d="${elArea(q.a,q.b)}" fill="var(--done)"/>`;});
-  h+=`<rect x="${ex(s.a)}" y="5" width="${ex(s.b)-ex(s.a)}" height="105" fill="var(--heather)" opacity="0.18"/>`;
-  [["Whinlatter",38],["Hartside",112],["Black Hill",143]].forEach(([n,k])=>h+=`<text x="${ex(k)}" y="${ey(elev(k))-5}" text-anchor="middle" font-family="Barlow,sans-serif" font-size="13" fill="var(--ink)">${n}</text>`);
-  h+=`<line id="elLine" x1="0" x2="0" y1="5" y2="110" stroke="var(--ink)" stroke-width="2"/>`;
-  $("elev").innerHTML=h;}
-
-// ---------------- Plan & grid ----------------
-function drawPlan(){
-  const s=sec(),len=s.b-s.a;
-  $("secTitle").textContent=`Section ${state.sel}: ${s.from} → ${s.to}, ${len} km`;
-  $("secMapH").textContent=`This section: ${s.from} → ${s.to}`;
-  $("planH").textContent=`Section ${state.sel} plan`;
-  $("plan").innerHTML=s.blocks.map((bl,j)=>{const[d,off,t]=bl,w=state.base+off;
-    return `<tr data-j="${j}"><td>${(j*len/8).toFixed(1)} km</td><td class="t">${t}</td><td><span class="d" style="background:${colour(d)}">${d}</span></td><td class="${off>0?"w-up":off<0?"w-dn":""}">${w} W</td></tr>`;}).join("");
-  $("grid").innerHTML=SECTIONS.map((q,i)=>`<button class="${q.climb?"climb ":""}${state.done[i+1]?"isdone ":""}${state.sel===i+1?"sel":""}" data-n="${i+1}" aria-label="Section ${i+1}, ${q.from} to ${q.to}${state.done[i+1]?", done":""}">${i+1}</button>`).join("");
-  const dn=Object.keys(state.done).map(Number);
-  $("secDone").textContent=dn.length;
-  $("kmDone").textContent=dn.reduce((t,n)=>t+SECTIONS[n-1].b-SECTIONS[n-1].a,0);
-  $("markBtn").textContent=state.done[state.sel]?`Mark section ${state.sel} not done`:`Mark section ${state.sel} done`;
-  $("gpxMsg").textContent=usingGpx?"Using your GPX route line.":"Using a rough built-in line. Load the C2C GPX (Whitehaven to Tynemouth) for the real route on the map.";
-  drawElev();
+function updateMapPos(){
+  if(!map)return;const s=sec(),k=s.a+R.dist/1000,p=posAt(k);
+  me.setLatLng(p);ridden.setLatLngs(slice(s.a,k));
+  GHOSTS.forEach(g=>{const on=S.ghosts[g.id]&&GH[g.id];const mk=ghostMk[g.id];if(!mk)return;
+    if(on){mk.setLatLng(posAt(s.a+distAtTime(GH[g.id],R.elapsed)/1000));if(!map.hasLayer(mk))mk.addTo(map);}else if(map.hasLayer(mk))mk.remove();});
+  me.bringToFront();
+  if(view.cur==="closeup"&&R.realClock-view.lastPan>2){map.panTo(p,{animate:true,duration:1});view.lastPan=R.realClock;}
 }
 
-// ---------------- Live panel ----------------
-function blockIdx(dist){return Math.min(7,Math.floor(dist/(lenM()/8)));}
-function curSpeed(w){return (pm.connected&&pm.speed>0.5)?pm.speed:speedFor(w);}
-function drawLive(){
-  const s=sec(),L=lenM(),dist=state.run.dist,j=blockIdx(dist),[d,off,t]=s.blocks[j],w=state.base+off,v=curSpeed(w);
-  $("dVal").textContent=d;$("damp").style.background=colour(d);
-  $("wVal").textContent=w+" W";$("tVal").textContent=t;
-  if(dist>=L)$("nVal").textContent="Section complete";
-  else if(j<7){const nb=s.blocks[j+1],sw=(j+1)*L/8;$("nVal").textContent=`Next: damper ${nb[0]}, ${state.base+nb[1]} W at ${(sw/1000).toFixed(1)} km, in ${fmt((sw-dist)/v)}`;}
-  else $("nVal").textContent=`Finish in ${fmt((L-dist)/v)}`;
-  $("barI").style.width=(dist/L*100)+"%";
-  $("clock").textContent=fmt(state.run.elapsed);
-  $("dist").textContent=`${(dist/1000).toFixed(2)} / ${L/1000} km`;
-  const k=s.a+dist/1000;moveMarkers(k);
-  const el=$("elLine");if(el){el.setAttribute("x1",ex(k));el.setAttribute("x2",ex(k));}
-  document.querySelectorAll("#plan tr").forEach(r=>r.classList.toggle("cur",+r.dataset.j===j));
+// ======================= VIEWS =======================
+const ROT=[["section",60],["closeup",15],["section",60],["route",10],["section",60],["elev",10]];
+const view={cur:null,want:"section",pin:null,i:0,t:0,feat:0,featName:"",shown:{},lastPan:0};
+function applyView(v,force){
+  if(v===view.cur&&!force)return;view.cur=v;
+  document.querySelectorAll("#tabs button[data-v]").forEach(b=>{b.classList.toggle("on",b.dataset.v===v);b.classList.toggle("pin",b.dataset.v===view.pin);});
+  $("autoBtn").hidden=!view.pin;
+  $("elevView").hidden=v!=="elev";$("featureCard").hidden=!(v==="closeup"&&view.feat>0);
+  if(!map)return;const s=sec();
+  if(TILES){const want=v==="closeup"?sat:osm,other=v==="closeup"?osm:sat;if(map.hasLayer(other))other.remove();if(!map.hasLayer(want))want.addTo(map);}
+  const pad={paddingTopLeft:[300,120],paddingBottomRight:[380,200]};
+  if(v==="section")map.fitBounds(L_.polyline(slice(s.a,s.b)).getBounds(),pad);
+  else if(v==="route")map.fitBounds(L_.polyline(route.map(p=>[p[0],p[1]])).getBounds(),pad);
+  else if(v==="closeup"){map.setView(posAt(s.a+R.dist/1000),15);view.lastPan=R.realClock;}
 }
-function drawMode(){
-  $("go").hidden=pm.connected;$("syncRow").hidden=pm.connected;
-  $("modeHint").textContent=pm.connected
-    ?"Live from the PM5. Start a new piece on the monitor at the start of the section, or tap Zero distance here."
-    :"Estimated mode: distance is worked out from the target watts. Tap Start when you start pedalling.";
+function rotate(dtRot){
+  const s=sec(),k=s.a+R.dist/1000;
+  // feature fly-ins
+  for(const[fk,name,note]of FEATURES){if(fk>=s.a&&fk<=s.b&&!view.shown[name]&&fk>k&&fk-k<=0.4){view.shown[name]=1;view.feat=15;$("fName").textContent=name;$("fNote").textContent=note;}}
+  let v;
+  if(view.pin)v=view.pin;
+  else if(R.toChange<(R.demo?200:20))v="section";
+  else if(view.feat>0){v="closeup";view.feat-=dtRot;}
+  else{view.t+=dtRot;if(view.t>=ROT[view.i][1]){view.t=0;view.i=(view.i+1)%ROT.length;}v=ROT[view.i][0];}
+  if(v!=="closeup")$("featureCard").hidden=true;else $("featureCard").hidden=!(view.feat>0);
+  applyView(v);
+}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==="auto"||view.pin===v)view.pin=null;else view.pin=v;applyView(view.pin||view.cur||"section",true);});
+
+// ======================= ELEVATION VIEW =======================
+function drawElev(){
+  const s=sec(),a=s.a,b=s.b,W=1000,H=400,e=[];let mn=1e9,mx=-1e9;
+  for(let i=0;i<=200;i++){const k=a+(b-a)*i/200,z=elevAt(k);e.push(z);mn=Math.min(mn,z);mx=Math.max(mx,z);}
+  mn=Math.max(0,mn-30);mx=mx+40;const X=i=>i/200*W,Y=z=>H-40-(z-mn)/(mx-mn)*(H-80);
+  const pts=e.map((z,i)=>X(i).toFixed(1)+","+Y(z).toFixed(1)).join(" L");
+  let h=`<path d="M0,${H-40} L${pts} L${W},${H-40} Z" fill="#3A4C52"/>`;
+  h+=`<clipPath id="rc"><rect id="rcRect" x="0" y="0" width="0" height="${H}"/></clipPath><path d="M0,${H-40} L${pts} L${W},${H-40} Z" fill="#6CC27A" clip-path="url(#rc)"/>`;
+  s.blocks.forEach((bl,j)=>h+=`<rect x="${j*W/8+1}" y="${H-30}" width="${W/8-2}" height="14" fill="${DCOL(bl[0])}"/>`);
+  h+=`<text x="8" y="${Y(mx-40)+4}" font-family="Barlow" font-size="18" fill="#EEF3F1">${Math.round(mx-40)} m</text><text x="8" y="${H-48}" font-family="Barlow" font-size="18" fill="#EEF3F1">${Math.round(mn+30)} m</text>`;
+  h+=`<g id="elGhosts"></g><line id="elMe" x1="0" x2="0" y1="20" y2="${H-40}" stroke="#FFFFFF" stroke-width="4"/>`;
+  $("elevSvg").innerHTML=h;
+}
+function updateElev(){const f=R.dist/lenM(),x=f*1000;const r=$("rcRect");if(r)r.setAttribute("width",x);const l=$("elMe");if(l){l.setAttribute("x1",x);l.setAttribute("x2",x);}
+  const g=$("elGhosts");if(g)g.innerHTML=GHOSTS.filter(q=>S.ghosts[q.id]&&GH[q.id]).map(q=>{const gx=distAtTime(GH[q.id],R.elapsed)/lenM()*1000;return`<line x1="${gx}" x2="${gx}" y1="40" y2="360" stroke="${q.col}" stroke-width="3" stroke-dasharray="6 6"/>`;}).join("");}
+
+// ======================= BAR & HUD =======================
+function drawBar(){
+  const s=sec(),bar=$("bar");bar.querySelectorAll(".seg").forEach(x=>x.remove());
+  s.blocks.forEach((bl,j)=>{const d=document.createElement("div");d.className="seg";d.innerHTML=`<div class="bg" style="background:${DCOL(bl[0])}"></div><div class="fill" style="background:${DCOL(bl[0])}"></div>`;bar.insertBefore(d,$("ticks"));});
+}
+function updateBar(){
+  const L=lenM(),segs=$("bar").querySelectorAll(".seg");
+  segs.forEach((sg,j)=>{const a=j*L/8,f=Math.max(0,Math.min(1,(R.dist-a)/(L/8)));sg.querySelector(".fill").style.width=(f*100)+"%";});
+  let t=`<i class="me" style="left:${R.dist/L*100}%"></i>`;
+  GHOSTS.forEach(g=>{if(S.ghosts[g.id]&&GH[g.id])t+=`<i style="left:${distAtTime(GH[g.id],R.elapsed)/L*100}%;background:${g.col}"></i>`;});
+  $("ticks").innerHTML=t;
+}
+function blockIdx(d){return Math.min(7,Math.floor(d/(lenM()/8)));}
+function updateHud(){
+  const s=sec(),L=lenM(),j=blockIdx(R.dist),[d,,ter]=s.blocks[j],w=targetW(j);
+  const dt=$("damp");dt.style.background=DCOL(d);dt.style.color=DINK(d);$("dVal").textContent=d;$("tVal").textContent=ter;
+  const df=curDF(),cal=S.dfCal[d];$("dfOk").textContent=(df&&cal)?(Math.abs(df-cal)<=10?"✓ Drag factor "+df+" on target":"Drag factor "+df+", aim for "+cal):"";
+  $("wVal").textContent=w+" W";
+  $("speedBig").textContent=R.v>0.05?sU(R.v).toFixed(1)+" "+uS():"–";
+  $("grad").textContent=(gradeAt(s.a+R.dist/1000)*100).toFixed(1)+"%";
+  const P=curPower();$("pmW").textContent=P>0?Math.round(P):"–";$("pmR").textContent=curRPM()||"–";$("pmD").textContent=df||"–";
+  $("pmLine").textContent=(pm.connected||R.demo)?`PM5 distance ${dU(pmDist()).toFixed(2)} ${uD()} · route ${dU(R.dist).toFixed(2)} ${uD()}`:"PM5 not connected";
+  $("clock").textContent=fmt(R.elapsed);
+  $("dist").textContent=`${dU(R.dist).toFixed(2)} / ${dU(L).toFixed(1)} ${uD()}`;
+  if(R.finished)$("nextTxt").textContent="Section complete";
+  else if(j<7){const nb=s.blocks[j+1];$("nextTxt").innerHTML=`Next: <strong style="color:${DCOL(nb[0])}">Damper ${nb[0]}</strong>, ${targetW(j+1)} W at ${dU((j+1)*L/8).toFixed(1)} ${uD()}${isFinite(R.toChange)?`, in <strong>${fmt(R.toChange)}</strong>`:""}`;}
+  else $("nextTxt").innerHTML=`Finish${isFinite(R.toChange)?` in <strong>${fmt(R.toChange)}</strong>`:""}`;
+  const pt=timeAtDist(PLAN,R.dist),gap=R.elapsed-pt;$("planTxt").textContent=R.dist>50?`Plan: ${Math.abs(gap)<3?"on schedule":fmt(Math.abs(gap))+(gap>0?" behind":" ahead")}`:"";
+  // warning
+  const warnLead=R.demo?120:10;
+  if(!R.finished&&j<7&&R.toChange<=warnLead&&R.v>0.3){const nb=s.blocks[j+1];const wb=$("warn");wb.hidden=false;wb.style.background=DCOL(nb[0]);wb.style.color=DINK(nb[0]);
+    $("warnT").textContent=fmt(R.demo?R.toChange/DEMO_X:R.toChange);$("warnD").textContent=`Damper ${nb[0]} · ${targetW(j+1)} W`;$("warnTer").textContent=nb[2];}
+  else $("warn").hidden=true;
+  // leaderboard
+  let rows=`<div class="row"><i style="background:#fff;outline:3px solid #5BB4E5"></i><span>You</span><span>${dU(R.dist).toFixed(2)} ${uD()}</span></div>`;
+  GHOSTS.forEach(g=>{if(!S.ghosts[g.id]||!GH[g.id])return;const gt=timeAtDist(GH[g.id],R.dist),diff=gt-R.elapsed;
+    rows+=`<div class="row"><i style="background:${g.col}"></i><span>${g.name}</span><span>${R.dist<20?"–":(diff<0?fmt(-diff)+" ahead":fmt(diff)+" behind")}</span></div>`;});
+  $("board").innerHTML=`<div class="k">Ghost riders</div>`+rows;
 }
 
-// ---------------- Sound ----------------
-let ac=null;
-function audio(){try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();}catch(e){}return ac;}
-function tone(f,st,dur,vol=0.25){const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type="sine";o.frequency.value=f;const t0=a.currentTime+st;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+0.02);g.gain.exponentialRampToValueAtTime(0.001,t0+dur);o.connect(g).connect(a.destination);o.start(t0);o.stop(t0+dur+0.05);}
-const warnSound=()=>{tone(880,0,0.15);tone(880,0.3,0.15);};
-const changeSound=()=>{tone(660,0,0.25);tone(880,0.25,0.25);tone(1100,0.5,0.45);try{navigator.vibrate&&navigator.vibrate([200,100,200]);}catch(e){}};
-const finishSound=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*0.22,0.4));};
-function flash(){const l=$("live");l.classList.add("flash");setTimeout(()=>l.classList.remove("flash"),1500);}
+// ======================= SOUND & VOICE =======================
+let ac=null,master=null;
+function audio(){try{if(!ac){ac=new (window.AudioContext||window.webkitAudioContext)();const comp=ac.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=8;master=ac.createGain();master.connect(comp);comp.connect(ac.destination);}
+  if(ac.state==="suspended")ac.resume();master.gain.value=S.vol/100*1.6;}catch(e){}return ac;}
+function tone(f,st,dur){const a=audio();if(!a)return;const t0=a.currentTime+st;[["square",0.45],["sawtooth",0.25]].forEach(([ty,v],i)=>{const o=a.createOscillator(),g=a.createGain();o.type=ty;o.frequency.value=f*(i?2:1);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+0.01);g.gain.setValueAtTime(v,t0+dur*0.7);g.gain.exponentialRampToValueAtTime(0.001,t0+dur);o.connect(g).connect(master);o.start(t0);o.stop(t0+dur+0.05);});}
+const warnSound=()=>{[0,0.35,0.7].forEach(t=>tone(988,t,0.16));};
+const changeSound=()=>{for(let r=0;r<3;r++)[880,1175,1568].forEach((f,i)=>tone(f,r*0.9+i*0.2,0.18));try{navigator.vibrate&&navigator.vibrate([300,150,300,150,300]);}catch(e){}};
+const finishSound=()=>{[523,659,784,1047,1319].forEach((f,i)=>tone(f,i*0.22,0.35));};
+let lastSpeak=-1e9;
+function say(txt,prio){if(!S.voice||!window.speechSynthesis)return;try{if(prio)speechSynthesis.cancel();else if(speechSynthesis.speaking)return;const u=new SpeechSynthesisUtterance(txt);u.lang="en-GB";u.rate=1.05;u.volume=Math.min(1,S.vol/100+0.2);speechSynthesis.speak(u);}catch(e){}}
+function flashTile(){const d=$("damp");d.classList.remove("flashy");void d.offsetWidth;d.classList.add("flashy");}
 
-// ---------------- Progress & alarms ----------------
-let warned=-1,lastBlock=null,finished=false;
-function advance(newDist,newElapsed){
-  const s=sec(),L=lenM();if(finished)return;
-  const j0=blockIdx(state.run.dist);
-  state.run.dist=Math.max(0,Math.min(L,newDist));state.run.elapsed=Math.max(0,newElapsed);
-  const j1=blockIdx(state.run.dist),w=state.base+s.blocks[j1][1];
-  if(state.run.dist>=L){finished=true;finishSound();flash();state.done[state.sel]=new Date().toISOString();stopEstimate();save();drawPlan();drawMaps(false);drawLive();return;}
-  if(j1>j0){changeSound();flash();warned=-1;}
-  else if(j1<7&&warned!==j1){const sw=(j1+1)*L/8;if((sw-state.run.dist)/curSpeed(w)<=10){warnSound();warned=j1;}}
-  drawLive();
+// ======================= COACH =======================
+const coach={last:-1e9,lastPlan:0,check:null,lowSince:null};
+function coachSay(msg,speak){$("coachTxt").textContent=msg;const now=R.realClock;if(speak&&S.coachVoice&&now-lastSpeak>(R.demo?3:8)){say(msg,false);lastSpeak=now;}coach.last=now;}
+function coachTick(dt){
+  if(R.finished||R.dist<30)return;
+  const j=blockIdx(R.dist),tw=targetW(j),P=curPower(),gap=R.realClock-coach.last,minGap=R.demo?4:20;
+  // damper check after a change
+  if(coach.check&&R.elapsed>=coach.check.due){const c=coach.check;coach.check=null;const df=curDF();
+    if(df){const cal=S.dfCal[c.d];if(cal&&Math.abs(df-cal)>10){coachSay(`Damper check: drag factor ${df}, aim for about ${cal}. Set the lever to ${c.d}.`,true);return;}
+      if(!cal&&c.dir!==0&&(df-c.df0)*c.dir<4){coachSay(`Damper still looks unchanged. Set it to ${c.d}.`,true);return;}}}
+  // watts
+  if(P>0&&P<tw*0.85){coach.lowSince=coach.lowSince??R.elapsed;if(R.elapsed-coach.lowSince>10&&gap>minGap){coachSay(`Watts low: ${Math.round(P)} against ${tw}. Push on.`,true);coach.lowSince=null;return;}}else coach.lowSince=null;
+  if(P>tw*1.25&&gap>minGap*2&&sec().blocks[j][1]<=0){coachSay(`Strong, but ${Math.round(P)} W is well over target. Save some for the climbs.`,false);return;}
+  // plan check every 3 minutes of ride time
+  if(R.elapsed-coach.lastPlan>(R.demo?600:300)&&gap>minGap){coach.lastPlan=R.elapsed;const g=R.elapsed-timeAtDist(PLAN,R.dist);
+    coachSay(Math.abs(g)<5?"Bang on plan. Keep it steady.":g>0?`${fmt(g)} behind plan. Lift the watts a touch.`:`${fmt(-g)} ahead of plan. Nice work.`,true);}
 }
-function resetRun(){state.run={n:state.sel,dist:0,elapsed:0};warned=-1;finished=false;save();}
 
-// ---------------- Estimated mode ----------------
-let running=false,last=0,timer=null,wake=null,saveTick=0;
-async function lockScreen(){try{if(navigator.wakeLock&&!wake)wake=await navigator.wakeLock.request("screen");}catch(e){}}
-function releaseScreen(){try{wake&&wake.release();}catch(e){}wake=null;}
-function startEstimate(){audio();if(finished)resetRun();running=true;last=performance.now();timer=setInterval(()=>{const now=performance.now(),dt=Math.min(2,(now-last)/1000);last=now;const s=sec(),w=state.base+s.blocks[blockIdx(state.run.dist)][1];advance(state.run.dist+speedFor(w)*dt,state.run.elapsed+dt);if(++saveTick%20===0)save();},250);$("go").textContent="Pause";lockScreen();lockUI();}
-function stopEstimate(){if(!running)return;running=false;clearInterval(timer);$("go").textContent="Start";save();releaseScreen();lockUI();}
-function lockUI(){const busy=running||(pm.connected&&state.run.dist>0&&!finished);document.querySelectorAll("#grid button").forEach(b=>b.disabled=busy);$("baseW").disabled=busy;}
+// ======================= RIDE ENGINE =======================
+const R={dist:0,elapsed:0,v:0,toChange:Infinity,finished:false,running:false,demo:false,realClock:0,blocks:[],trace:[],block:0,pm0:0};
+function resetRide(){Object.assign(R,{dist:0,elapsed:0,v:0,toChange:Infinity,finished:false,running:false,blocks:Array.from({length:8},()=>({t:0,e:0})),trace:[[0,0]],block:0,pm0:pm.dist,sim:{d:0,df:curDFRaw(),dset:sec().blocks[0][0],lagUntil:0}});
+  view.shown={};view.feat=0;view.i=0;view.t=0;coach.check=null;coach.lastPlan=0;coach.lowSince=null;$("coachTxt").textContent="Ready when you are.";
+  $("go").textContent="Start";$("go").hidden=pm.connected;}
+function curPower(){if(R.demo)return R.sim?R.sim.P||0:0;if(pm.connected)return pm.power>0?pm.power:(pm.speed>0.5?0.35*pm.speed**3:0);return R.running?targetW(blockIdx(R.dist)):0;}
+function curRPM(){if(R.demo)return R.sim?R.sim.rpm:0;return pm.connected?pm.rpm:0;}
+function curDFRaw(){return pm.connected?pm.drag:0;}
+function curDF(){if(R.demo)return R.sim?Math.round(R.sim.df):0;return pm.connected?pm.drag:0;}
+function pmDist(){if(R.demo)return R.sim?R.sim.d:0;return Math.max(0,pm.dist-R.pm0);}
+const SIMDF=d=>60+d*14; // illustrative drag factor per damper for the demo only
+function demoStep(dt){
+  const sm=R.sim,j=blockIdx(R.dist),tw=targetW(j);let f=0.98+0.06*Math.sin(R.elapsed/47)+0.03*Math.sin(R.elapsed/13);
+  if(j===2&&(R.dist%(lenM()/8))/(lenM()/8)>0.3&&(R.dist%(lenM()/8))/(lenM()/8)<0.6)f=0.78; // a lazy patch on the steep bit
+  sm.P=Math.max(40,tw*f);sm.rpm=Math.round(100-sec().blocks[j][0]*4+3*Math.sin(R.elapsed/5));
+  sm.d+=Math.cbrt(sm.P/0.35)*dt;
+  const want=sec().blocks[j][0];if(sm.dset!==want&&R.elapsed>=sm.lagUntil)sm.dset=want;
+  sm.df+=(SIMDF(sm.dset)-sm.df)*Math.min(1,dt/6);
+}
+function onBlockChange(j0,j1){
+  const s=sec(),nb=s.blocks[j1];changeSound();flashTile();say(`Damper ${nb[0]}. ${targetW(j1)} watts. ${nb[2]}.`,true);
+  coach.check={due:R.elapsed+(R.demo?60:15),d:nb[0],dir:Math.sign(nb[0]-s.blocks[j0][0]),df0:curDF()};
+  if(R.demo&&R.sim)R.sim.lagUntil=R.elapsed+(j1===3?90:8); // one slow damper change in the demo, so the coach can spot it
+}
+let warned=-1,lastT=performance.now(),pmLastDist=0,pmLastMove=-1e9;
+function tick(){
+  const now=performance.now(),dtReal=Math.min(1,(now-lastT)/1000);lastT=now;R.realClock+=dtReal;
+  let dt=0;
+  if(R.demo&&!R.finished)dt=dtReal*DEMO_X;
+  else if(pm.connected&&!R.finished){if(pm.dist>pmLastDist+0.05){pmLastDist=pm.dist;pmLastMove=R.realClock;}if(R.realClock-pmLastMove<3)dt=dtReal;}
+  else if(R.running&&!R.finished)dt=dtReal;
+  if(dt>0){
+    if(R.demo)demoStep(dt);
+    const s=sec(),L=lenM(),j0=blockIdx(R.dist),P=curPower(),k=s.a+R.dist/1000;
+    const vs=roadSpeed(P,gradeAt(k));R.v+=(vs-R.v)*Math.min(1,dt/PHYS.tau);
+    R.dist=Math.min(L,R.dist+R.v*dt);R.elapsed+=dt;
+    R.blocks[j0].t+=dt;R.blocks[j0].e+=P*dt;
+    if(R.elapsed-R.trace[R.trace.length-1][0]>=5)R.trace.push([R.elapsed,R.dist]);
+    const j1=blockIdx(R.dist);
+    R.toChange=R.v>0.3?((j1<7?(j1+1)*L/8:L)-R.dist)/R.v:Infinity;
+    if(R.dist>=L){finish();}
+    else{if(j1>j0){onBlockChange(j0,j1);warned=-1;}
+      else if(j1<7&&warned!==j1&&R.toChange<=(R.demo?120:10)){warned=j1;warnSound();say(`Change in ${R.demo?"a moment":"ten seconds"}. Damper ${s.blocks[j1+1][0]}.`,false);}
+      coachTick(dt);}
+    updateMapPos();updateBar();updateElev();
+  }
+  rotate(R.demo?dtReal*7.5:dtReal);
+  updateHud();
+}
 
-// ---------------- PM5 Bluetooth ----------------
-// Concept2 PM5 Bluetooth Smart Interface: base UUID CE06xxxx-43E5-11E4-916C-0800200C9A66
+// ======================= FINISH & DEBRIEF =======================
+function finish(){
+  R.finished=true;R.running=false;R.toChange=Infinity;R.trace.push([R.elapsed,R.dist]);finishSound();say("Section complete. Great ride.",true);
+  const wasDemo=R.demo;let newBest=false;
+  if(!wasDemo){S.done[S.sel]=new Date().toISOString();const b=S.best[S.sel];if(!b||R.elapsed<b.time){S.best[S.sel]={time:R.elapsed,date:new Date().toISOString(),trace:R.trace};newBest=!!b;}save();}
+  showDebrief(wasDemo,newBest);releaseScreen();
+}
+function showDebrief(wasDemo,newBest){
+  const s=sec(),L=lenM(),planT=PLAN.length-1,diff=R.elapsed-planT,tot=R.blocks.reduce((a,b)=>a+b.e,0);
+  const avgW=tot/Math.max(1,R.elapsed),avgT=s.blocks.reduce((a,b,j)=>a+targetW(j)*(timeAtDist(PLAN,(j+1)*L/8)-timeAtDist(PLAN,j*L/8)),0)/planT;
+  const rows=s.blocks.map((bl,j)=>{const b=R.blocks[j],pt=timeAtDist(PLAN,(j+1)*L/8)-timeAtDist(PLAN,j*L/8),aw=b.t?b.e/b.t:0,d=b.t-pt;
+    return `<tr><td><span class="chip" style="background:${DCOL(bl[0])};color:${DINK(bl[0])}">${bl[0]}</span></td><td class="w">${bl[2]}</td><td>${targetW(j)} W</td><td>${Math.round(aw)} W</td><td>${fmt(b.t)}</td><td>${fmt(pt)}</td><td class="${d>5?"neg":d<-5?"pos":""}">${Math.abs(d)<5?"on plan":fmtGap(d)}</td></tr>`;}).join("");
+  let worst=null;s.blocks.forEach((bl,j)=>{const b=R.blocks[j],pt=timeAtDist(PLAN,(j+1)*L/8)-timeAtDist(PLAN,j*L/8),d=b.t-pt;if(d>10&&(!worst||d>worst.d))worst={j,d,aw:b.t?b.e/b.t:0};});
+  const ghosts=GHOSTS.filter(g=>S.ghosts[g.id]&&GH[g.id]&&!(g.id==="best"&&newBest)).map(g=>{const gt=GH[g.id].length-1,d=R.elapsed-gt;return`<tr><td><span class="chip" style="background:${g.col}"> </span></td><td>${g.name}</td><td>${fmt(gt)}</td><td class="${d>0?"neg":"pos"}">${d>0?"beat you by "+fmt(d):"you won by "+fmt(-d)}</td></tr>`;}).join("");
+  $("dbBox").innerHTML=`<h2 id="dbTitle">${wasDemo?"Demo debrief":"Section "+S.sel+" complete"}</h2><div class="k">${s.from} → ${s.to}${newBest?" · New personal best":""}</div>
+   <div class="kpis"><div><span class="k">Your time</span><b>${fmt(R.elapsed)}</b></div><div><span class="k">Plan time</span><b>${fmt(planT)}</b></div><div><span class="k">Against plan</span><b class="${diff>5?"neg":"pos"}">${Math.abs(diff)<5?"On plan":fmtGap(diff)}</b></div><div><span class="k">Average watts</span><b>${Math.round(avgW)} <small style="font-size:16px">/ ${Math.round(avgT)} target</small></b></div></div>
+   ${worst?`<p>Biggest time cost: <strong>${s.blocks[worst.j][2]}</strong>, ${fmt(worst.d)} slower than plan at an average of ${Math.round(worst.aw)} W against ${targetW(worst.j)} W.</p>`:"<p>No block cost you more than 10 seconds against plan.</p>"}
+   <h3 class="cond" style="font-size:22px;margin:16px 0 6px">Distance check</h3>
+   <p>Route distance ridden: <strong>${dU(L).toFixed(2)} ${uD()}</strong>. Distance on the PM5: <strong>${(pm.connected||wasDemo)?dU(pmDist()).toFixed(2)+" "+uD():"not connected"}</strong>. The two differ because the route distance includes the hills: climbs slow your road speed and descents speed it up, while the PM5 counts every watt the same. Your time is what the hills changed.</p>
+   <h3 class="cond" style="font-size:22px;margin:16px 0 6px">Block by block</h3>
+   <div class="scroll"><table><thead><tr><th>Damper</th><th>Terrain</th><th>Target</th><th>Avg</th><th>Time</th><th>Plan</th><th>±</th></tr></thead><tbody>${rows}</tbody></table></div>
+   ${ghosts?`<h3 class="cond" style="font-size:22px;margin:16px 0 6px">Ghost riders</h3><div class="scroll"><table><tbody>${ghosts}</tbody></table></div>`:""}
+   <div class="btns" style="margin-top:16px"><button class="b pri" id="dbClose">${wasDemo?"Finish demo":"Close"}</button></div>`;
+  $("debrief").hidden=false;$("dbClose").focus();
+  $("dbClose").onclick=()=>{$("debrief").hidden=true;if(wasDemo)endDemo();else{if(S.sel<13)S.sel++;save();selectSection();}};
+}
+
+// ======================= DEMO =======================
+let preDemoSel=null;
+function startDemo(){audio();if(R.demo){endDemo();return;}preDemoSel=S.sel;S.sel=7;R.demo=true;selectSection(true);R.demo=true;R.sim={d:0,df:SIMDF(sec().blocks[0][0]),dset:sec().blocks[0][0],lagUntil:0,P:0,rpm:0};
+  $("demo").textContent="Stop demo";$("go").hidden=true;$("connect").disabled=true;coachSay("Demo ride: section 7 over Hartside, at 40 times speed.",false);lockScreen();}
+function endDemo(){R.demo=false;$("demo").textContent="Demo ride";$("connect").disabled=false;if(preDemoSel)S.sel=preDemoSel;preDemoSel=null;selectSection();releaseScreen();}
+
+// ======================= PM5 BLUETOOTH =======================
 const U=s=>`ce06${s}-43e5-11e4-916c-0800200c9a66`;
-const pm={connected:false,device:null,dist:0,elapsed:0,speed:0,rpm:0,power:0,drag:0,offD:0,offT:0,lastDist:0};
+const pm={connected:false,device:null,dist:0,elapsed:0,speed:0,rpm:0,power:0,drag:0};
 const u24=(dv,o)=>dv.getUint8(o)|(dv.getUint8(o+1)<<8)|(dv.getUint8(o+2)<<16);
-function onStatus(e){const dv=e.target.value;if(dv.byteLength<6)return;
-  pm.elapsed=u24(dv,0)/100;pm.dist=u24(dv,3)/10;if(dv.byteLength>18)pm.drag=dv.getUint8(18);
-  if(pm.dist<pm.lastDist-20){pm.offD=0;pm.offT=0;} // new piece started on the monitor
-  pm.lastDist=pm.dist;
-  advance(pm.dist-pm.offD,pm.elapsed-pm.offT);showPm();}
-function onStatus2(e){const dv=e.target.value;if(dv.byteLength<6)return;pm.speed=dv.getUint16(3,true)/1000;pm.rpm=dv.getUint8(5);showPm();}
-function onStroke2(e){const dv=e.target.value;if(dv.byteLength<5)return;pm.power=dv.getUint16(3,true);showPm();}
-function showPm(){$("pmW").textContent=pm.power||"–";$("pmR").textContent=pm.rpm||"–";$("pmD").textContent=pm.drag||"–";
-  if(!$("debug").hidden)$("debug").textContent=`PM5 distance ${pm.dist.toFixed(1)} m\nPM5 time ${pm.elapsed.toFixed(1)} s\nSpeed ${pm.speed.toFixed(2)} m/s\nCadence ${pm.rpm}\nPower ${pm.power} W\nDrag factor ${pm.drag}\nZero offset ${pm.offD.toFixed(1)} m`;}
+function onStatus(e){const dv=e.target.value;if(dv.byteLength<6)return;pm.elapsed=u24(dv,0)/100;const d=u24(dv,3)/10;if(d<pm.dist-20){R.pm0=0;pmLastDist=0;}pm.dist=d;if(dv.byteLength>18)pm.drag=dv.getUint8(18);showDbg();}
+function onStatus2(e){const dv=e.target.value;if(dv.byteLength<6)return;pm.speed=dv.getUint16(3,true)/1000;pm.rpm=dv.getUint8(5);showDbg();}
+function onStroke2(e){const dv=e.target.value;if(dv.byteLength<5)return;pm.power=dv.getUint16(3,true);showDbg();}
+function showDbg(){if(!$("debugTxt").hidden)$("debugTxt").textContent=`PM5 distance ${pm.dist.toFixed(1)} m\nPM5 time ${pm.elapsed.toFixed(1)} s\nSpeed ${pm.speed.toFixed(2)} m/s\nCadence ${pm.rpm}\nPower ${pm.power} W\nDrag factor ${pm.drag}\nRide zero at ${R.pm0.toFixed(1)} m`;}
 async function connect(){
   audio();
-  if(!navigator.bluetooth){$("connMsg").textContent="This browser can’t use Bluetooth. Use Chrome on Android or a computer, or the Bluefy browser on iPhone.";return;}
-  try{
-    $("connMsg").textContent="Choose your PM5…";
+  if(!navigator.bluetooth){coachSay("This browser can’t use Bluetooth. Use Chrome on a laptop or Android, or Bluefy on iPhone.",false);return;}
+  try{coachSay("Choose your PM5…",false);
     const dev=await navigator.bluetooth.requestDevice({filters:[{namePrefix:"PM5"}],optionalServices:[U("0030"),U("0010")]});
     pm.device=dev;dev.addEventListener("gattserverdisconnected",onDisconnect);
-    $("connMsg").textContent="Connecting…";
-    const server=await dev.gatt.connect();const svc=await server.getPrimaryService(U("0030"));
-    const subs=[["0031",onStatus],["0032",onStatus2],["0036",onStroke2]];
-    for(const[c,fn]of subs){try{const ch=await svc.getCharacteristic(U(c));ch.addEventListener("characteristicvaluechanged",fn);await ch.startNotifications();}catch(err){console.warn("PM5 characteristic",c,err);}}
-    stopEstimate();pm.connected=true;$("dot").classList.add("on");
-    $("connMsg").textContent="Connected to "+(dev.name||"PM5");$("connect").textContent="Disconnect";
-    lockScreen();drawMode();
-  }catch(err){$("connMsg").textContent=err&&err.name==="NotFoundError"?"No PM5 chosen.":"Couldn’t connect: "+(err&&err.message||err);}
+    const server=await dev.gatt.connect(),svc=await server.getPrimaryService(U("0030"));
+    for(const[c,fn]of[["0031",onStatus],["0032",onStatus2],["0036",onStroke2]]){try{const ch=await svc.getCharacteristic(U(c));ch.addEventListener("characteristicvaluechanged",fn);await ch.startNotifications();}catch(err){console.warn("PM5",c,err);}}
+    pm.connected=true;R.running=false;R.pm0=pm.dist;pmLastDist=pm.dist;$("connect").textContent="Disconnect PM5";$("go").hidden=true;
+    coachSay("PM5 connected. Start pedalling when you’re ready.",false);lockScreen();
+  }catch(err){coachSay(err&&err.name==="NotFoundError"?"No PM5 chosen.":"Couldn’t connect: "+(err&&err.message||err),false);}
 }
-function onDisconnect(){pm.connected=false;$("dot").classList.remove("on");$("connect").textContent="Connect PM5";$("connMsg").textContent="PM5 disconnected – using estimated distance";save();releaseScreen();drawMode();lockUI();}
+function onDisconnect(){pm.connected=false;$("connect").textContent="Connect PM5";$("go").hidden=false;coachSay("PM5 disconnected.",false);releaseScreen();}
 function disconnect(){try{pm.device&&pm.device.gatt.connected&&pm.device.gatt.disconnect();}catch(e){}onDisconnect();}
 
-// ---------------- GPX ----------------
+// ======================= SCREEN WAKE =======================
+let wake=null;
+async function lockScreen(){try{if(navigator.wakeLock&&!wake)wake=await navigator.wakeLock.request("screen");}catch(e){}}
+function releaseScreen(){try{wake&&wake.release();}catch(e){}wake=null;}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&(R.running||pm.connected||R.demo)){wake=null;lockScreen();}});
+
+// ======================= GPX =======================
 function loadGpx(text){
   const doc=new DOMParser().parseFromString(text,"application/xml");
   let pts=[...doc.getElementsByTagName("trkpt")];if(pts.length<2)pts=[...doc.getElementsByTagName("rtept")];
-  let ll=pts.map(p=>[parseFloat(p.getAttribute("lat")),parseFloat(p.getAttribute("lon"))]).filter(p=>!isNaN(p[0])&&!isNaN(p[1]));
+  let ll=pts.map(p=>{const e=p.getElementsByTagName("ele")[0];return[parseFloat(p.getAttribute("lat")),parseFloat(p.getAttribute("lon")),e?parseFloat(e.textContent):null];}).filter(p=>!isNaN(p[0])&&!isNaN(p[1]));
   if(ll.length<10)throw new Error("No route points found in that file.");
-  if(ll[0][1]>ll[ll.length-1][1])ll.reverse(); // make it run west to east
-  const step=Math.max(1,Math.ceil(ll.length/3000));ll=ll.filter((p,i)=>i%step===0||i===ll.length-1);
-  let cum=0;const out=[[ll[0][0],ll[0][1],0]];for(let i=1;i<ll.length;i++){cum+=hav(ll[i-1],ll[i]);out.push([ll[i][0],ll[i][1],cum]);}
-  const scale=222/cum;out.forEach(p=>p[2]=+(p[2]*scale).toFixed(3));out.forEach(p=>{p[0]=+p[0].toFixed(5);p[1]=+p[1].toFixed(5);});
-  return{route:out,km:cum};
+  if(ll[0][1]>ll[ll.length-1][1])ll.reverse();
+  const step=Math.max(1,Math.ceil(ll.length/4000));ll=ll.filter((p,i)=>i%step===0||i===ll.length-1);
+  let cum=0;const out=[[ll[0][0],ll[0][1],0,ll[0][2]]];for(let i=1;i<ll.length;i++){cum+=hav(ll[i-1],ll[i]);out.push([ll[i][0],ll[i][1],cum,ll[i][2]]);}
+  const sc=222/cum;out.forEach(p=>{p[2]=+(p[2]*sc).toFixed(3);p[0]=+p[0].toFixed(5);p[1]=+p[1].toFixed(5);if(p[3]!=null&&!isNaN(p[3]))p[3]=Math.round(p[3]);else p[3]=null;});
+  return{route:out,km:cum,ele:out.some(p=>p[3]!=null)};
 }
-$("gpxFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
-  r.onload=()=>{try{const g=loadGpx(r.result);route=g.route;usingGpx=true;try{localStorage.setItem(GKEY,JSON.stringify(route));}catch(err){}
-    drawPlan();drawMaps(true);drawLive();$("gpxMsg").textContent=`Loaded: ${g.km.toFixed(0)} km route line. Sections are scaled to fit it.`;}
-    catch(err){$("gpxMsg").textContent="Couldn’t read that file: "+err.message;}};r.readAsText(f);};
-$("gpxClear").onclick=()=>{route=WP.map(w=>[w[1],w[2],w[0]]);usingGpx=false;try{localStorage.removeItem(GKEY);}catch(e){}drawPlan();drawMaps(true);drawLive();};
 
-// ---------------- Controls ----------------
+// ======================= SETTINGS UI =======================
+function drawSettings(){
+  const s=sec();
+  $("grid").innerHTML=SECTIONS.map((q,i)=>`<button class="${q.climb?"climb ":""}${S.done[i+1]?"done ":""}${S.sel===i+1?"sel":""}" data-n="${i+1}" aria-label="Section ${i+1}, ${q.from} to ${q.to}${S.done[i+1]?", done":""}">${i+1}</button>`).join("");
+  const dn=Object.keys(S.done).map(Number);$("doneTxt").textContent=`${dn.length} of 13 sections done · ${dU(dn.reduce((t,n)=>t+(SECTIONS[n-1].b-SECTIONS[n-1].a)*1000,0)).toFixed(0)} of ${dU(222000).toFixed(0)} ${uD()}`;
+  $("markBtn").textContent=S.done[S.sel]?`Mark ${S.sel} not done`:`Mark ${S.sel} done`;
+  $("plan").innerHTML=s.blocks.map((bl,j)=>`<tr><td>${dU(j*lenM()/8).toFixed(1)} ${uD()}</td><td class="w">${bl[2]}</td><td><span class="chip" style="background:${DCOL(bl[0])};color:${DINK(bl[0])}">${bl[0]}</span></td><td>${targetW(j)} W</td></tr>`).join("");
+  $("weight").value=S.weight;$("baseW").value=S.base;$("units").value=S.units;$("vol").value=S.vol;$("voice").checked=S.voice;$("coachVoice").checked=S.coachVoice;
+  $("ghostList").innerHTML=GHOSTS.map(g=>{const extra=g.wkg?` (${g.wkg} W/kg, ${Math.round(g.wkg*S.weight)} W base)`:g.id==="steady"?" (your plan)":S.best[S.sel]?` (${fmt(S.best[S.sel].time)})`:" (after your first ride of this section)";
+    return`<label class="chk"><input type="checkbox" data-g="${g.id}" ${S.ghosts[g.id]?"checked":""}><i style="background:${g.col}"></i>${g.name}<span class="hint">${extra}</span></label>`;}).join("");
+  $("calD").innerHTML=Array.from({length:10},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join("");
+  $("calTbl").innerHTML=Array.from({length:10},(_,i)=>`<tr><td><span class="chip" style="background:${DCOL(i+1)};color:${DINK(i+1)}">${i+1}</span></td><td>${S.dfCal[i+1]||"–"}</td></tr>`).join("");
+  $("gpxMsg").textContent=usingGpx?"Using your GPX route.":"Using a rough built-in line. Load the C2C GPX (Whitehaven to Tynemouth) for the real roads and gradients.";
+}
+function selectSection(keepDemo){if(!keepDemo)R.demo=false;precompute();resetRide();drawRoute();drawBar();drawElev();drawSettings();updateBar();updateElev();updateHud();}
+function refreshAll(){precompute();drawBar();drawSettings();updateBar();updateHud();}
+$("grid").onclick=e=>{const b=e.target.closest("button[data-n]");if(!b||R.demo)return;S.sel=+b.dataset.n;save();selectSection();};
+$("restart").onclick=()=>{if(R.demo)endDemo();selectSection();};
+$("markBtn").onclick=()=>{if(S.done[S.sel])delete S.done[S.sel];else S.done[S.sel]=new Date().toISOString();save();drawSettings();drawRoute();};
+$("weight").onchange=()=>{const v=+$("weight").value;if(v>=40&&v<=200){S.weight=v;save();refreshAll();}else $("weight").value=S.weight;};
+$("baseW").onchange=()=>{const v=+$("baseW").value;if(v>=60&&v<=400){S.base=v;save();refreshAll();}else $("baseW").value=S.base;};
+$("units").onchange=()=>{S.units=$("units").value;save();drawSettings();updateHud();};
+$("vol").oninput=()=>{S.vol=+$("vol").value;save();if(master)master.gain.value=S.vol/100*1.6;};
+$("voice").onchange=()=>{S.voice=$("voice").checked;save();};
+$("coachVoice").onchange=()=>{S.coachVoice=$("coachVoice").checked;save();};
+$("ghostList").onchange=e=>{const c=e.target.closest("input[data-g]");if(!c)return;S.ghosts[c.dataset.g]=c.checked;save();updateBar();updateHud();updateMapPos();};
+$("ghostAll").onclick=()=>{GHOSTS.forEach(g=>S.ghosts[g.id]=true);save();drawSettings();updateBar();updateHud();updateMapPos();};
+$("ghostNone").onclick=()=>{GHOSTS.forEach(g=>S.ghosts[g.id]=false);save();drawSettings();updateBar();updateHud();updateMapPos();};
+$("test").onclick=()=>{audio();changeSound();flashTile();say("Damper eight. One hundred and fifty five watts.",true);};
+$("calBtn").onclick=()=>{const df=curDF();const d=+$("calD").value;if(!df){coachSay("Connect the PM5 and pedal first, so there’s a drag factor to record.",false);return;}S.dfCal[d]=df;save();drawSettings();};
+$("gpxFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const g=loadGpx(r.result);route=g.route;usingGpx=true;try{localStorage.setItem(GKEY,JSON.stringify(route));}catch(err){}buildElev();selectSection();$("gpxMsg").textContent=`Loaded a ${g.km.toFixed(0)} km route${g.ele?" with elevation":", but it has no elevation, so gradients use the built-in profile"}. Sections are scaled to fit it.`;}catch(err){$("gpxMsg").textContent="Couldn’t read that file: "+err.message;}};r.readAsText(f);};
+$("gpxClear").onclick=()=>{route=WP.map(w=>[w[1],w[2],w[0],null]);usingGpx=false;try{localStorage.removeItem(GKEY);}catch(e){}buildElev();selectSection();};
+$("zero").onclick=()=>{R.pm0=pm.dist;updateHud();};
+$("dbgBtn").onclick=()=>{const d=$("debugTxt");d.hidden=!d.hidden;$("dbgBtn").textContent=d.hidden?"Show raw data":"Hide raw data";showDbg();};
+let armed=false;$("reset").onclick=()=>{if(!armed){armed=true;$("reset").textContent="Tap again to clear everything";setTimeout(()=>{armed=false;$("reset").textContent="Reset all progress";},4000);return;}armed=false;S.done={};S.best={};S.sel=1;save();$("reset").textContent="Reset all progress";selectSection();};
+$("setBtn").onclick=()=>{const d=$("drawer");d.hidden=!d.hidden;$("setBtn").setAttribute("aria-expanded",String(!d.hidden));if(!d.hidden)drawSettings();};
+$("closeSet").onclick=()=>{$("drawer").hidden=true;$("setBtn").setAttribute("aria-expanded","false");};
 $("connect").onclick=()=>pm.connected?disconnect():connect();
-$("go").onclick=()=>running?stopEstimate():startEstimate();
-$("zero").onclick=()=>{pm.offD=pm.dist;pm.offT=pm.elapsed;stopEstimate();resetRun();drawLive();lockUI();};
-$("test").onclick=()=>{changeSound();flash();};
-$("syncBtn").onclick=()=>{const v=parseFloat($("sync").value);if(isNaN(v))return;state.run.dist=Math.max(0,Math.min(lenM(),v*1000));warned=-1;$("sync").value="";save();drawLive();};
-$("grid").onclick=e=>{const b=e.target.closest("button[data-n]");if(!b||b.disabled)return;const n=+b.dataset.n;if(n===state.sel)return;
-  state.sel=n;resetRun();if(pm.connected){pm.offD=pm.dist;pm.offT=pm.elapsed;}drawPlan();drawMaps(true);drawLive();};
-$("baseW").value=state.base;
-$("baseW").onchange=()=>{const v=parseInt($("baseW").value,10);if(v>=60&&v<=300){state.base=v;save();drawPlan();drawLive();}else $("baseW").value=state.base;};
-$("markBtn").onclick=()=>{if(state.done[state.sel])delete state.done[state.sel];else state.done[state.sel]=new Date().toISOString();save();drawPlan();drawMaps(false);drawLive();};
-let armed=false;
-$("reset").onclick=()=>{if(!armed){armed=true;$("reset").textContent="Tap again to clear everything";setTimeout(()=>{armed=false;$("reset").textContent="Reset all progress";},4000);return;}
-  armed=false;stopEstimate();state.done={};state.sel=1;resetRun();$("reset").textContent="Reset all progress";drawPlan();drawMaps(true);drawLive();};
-$("dbgBtn").onclick=()=>{const d=$("debug");d.hidden=!d.hidden;$("dbgBtn").textContent=d.hidden?"Show PM5 data":"Hide PM5 data";showPm();};
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&(running||pm.connected))lockScreen();});
+$("go").onclick=()=>{audio();if(R.finished)selectSection();R.running=!R.running;$("go").textContent=R.running?"Pause":"Start";if(R.running){lockScreen();coachSay("Estimated mode: riding at the target watts. Connect the PM5 for your real effort.",false);}};
+$("demo").onclick=startDemo;
 
-if(state.run.n!==state.sel)resetRun();
-drawPlan();initMaps();drawLive();drawMode();
+// ======================= START =======================
+buildElev();initMap();selectSection();
+setInterval(tick,200);
 </script>
 </body>
 </html>
